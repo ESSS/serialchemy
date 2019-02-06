@@ -1,0 +1,8 @@
+name: serialchemy
+
+includes:
+  - {{ root }}/../eden/sqlalchemy.devenv.yml
+
+environment:  
+  PYTHONPATH:
+    - {{ root }}/src

@@ -1,0 +1,55 @@
+language: python
+
+stages:
+- test
+- name: deploy
+  if: repo = ESSS/serialchemy AND tag IS present
+
+install:
+- pip install -U pip
+- pip install -U tox
+
+script:
+- tox
+
+jobs:
+  include:
+    - python: '3.6'
+      env: TOXENV=linting
+
+    - python: '3.6'
+      env: TOXENV=docs
+
+    - python: '2.7'
+      env: TOXENV=py27
+
+    - python: '3.6'
+      env: TOXENV=py36
+
+    - python: '3.7'
+      env: TOXENV=py37
+      sudo: required
+      dist: xenial
+
+    - stage: deploy
+      python: '3.6'
+      env:
+      install: pip install -U setuptools setuptools_scm
+      script: skip
+      deploy:
+        provider: pypi
+        distributions: sdist bdist_wheel
+        user: 
+        password:
+          # Install travis-ci CLI tool and run the command travis encrypt to generate
+          # the secure password
+          secure: REPLACE
+        on:
+          tags: true
+          repo: ESSS/serialchemy
+          python: 3.6
+
+branches:
+  only:
+  - master
+  - "/v(\\d+\\.)*\\d/"
