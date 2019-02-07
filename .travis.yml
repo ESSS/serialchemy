@@ -16,31 +16,23 @@ jobs:
   include:
   - python: '3.6'
     env: TOXENV=linting
-    
+
   - python: '3.6'
     env: TOXENV=docs
-
-  - python: '3.7'
-    env: TOXENV=py37
-    sudo: required
-    dist: xenial
 
   - python: '3.6'
     env: TOXENV=py36
 
-  - python: '3.5'
-    env: TOXENV=py35
-    
   - stage: deploy
     python: '3.6'
-    env: 
+    env:
     install: pip install -U setuptools setuptools_scm
     script: skip
     deploy:
       provider: pypi
       distributions: sdist bdist_wheel
       user: icandeia
-      password: 
+      password:
         secure: TFY6BPJYJsWpoBf1hzZ2F/UpJTA69SSk0o5Abw5XKzAhbljAkb+gVoX5+GKxmYc+G1CmqK7bU0uAEL2XuejJ5cg1bZt6oiOSSqZQwXc81ylFOnThmzHuM66VFdnoSDhy5nV2rntyHOWMvhy0sTyBNQ2YGjSMAz1kTBfquGtAoOSfirhKHuOE8FtIEIxO+WHjg4irm3Enc8xYxuKuz2mFvjbWMJdWsdPZ7tGIWzGTFiDYEA738mPR2PZFzOH3Njz6daItlPVL+EswrMWkLeT1AImgmaHvII6VY4LbRUadCJz1hRd9/UGiX5pjlcmHzWkafjctHJTTe4OD+Kv1ab6sPFeKKPhMgnRN3EZfbY7zqldxByrEkifkUa+GBVZCgh3N1UGyE6FoCL96STB9JGflAIYzT0SrarDF/M4BrVqqhVLo6BUz6HY8mjkNfLREpHIxmQw3siWSedSm6bn/AptQExn7ZH95aw5Bwok8mbHN/innkIrpyaDfCeZcBb6WrraMudvkfgm0tJrLqQ5oGxfCVOHOtq4ESoInRvdxVqH0whGqoQHS0PqSRjfYZz+vTEdzTU6t0UIyKSTVF0K+IhmtM5mCB2JJWMOcORAW4sNa5Kq6wgQ9AD/OHXG4X0CtkXVW7xmwcDfsjZ3N1wVFHcn01QvAWF9qJklsfuUiNbTV0DY=
       on:
         tags: true
