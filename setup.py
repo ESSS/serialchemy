@@ -28,7 +28,7 @@ setuptools.setup(
     license="MIT license",
     long_description=readme + "\n\n" + history,
     include_package_data=True,
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     keywords="serialchemy",
     name="serialchemy",
     packages=setuptools.find_packages(where="src"),
