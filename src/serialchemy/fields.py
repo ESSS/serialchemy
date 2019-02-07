@@ -1,5 +1,6 @@
-from sqlalchemy.orm.dynamic import AppenderMixin
 from typing import Union
+
+from sqlalchemy.orm.dynamic import AppenderMixin
 
 
 class Field(object):
@@ -16,17 +17,15 @@ class Field(object):
     def serializer(self):
         return self._serializer
 
-
     def dump(self, value):
         if value and self.serializer:
             return self.serializer.dump(value)
         else:
             return value
 
-
-    def load(self, serialized):
+    def load(self, serialized, session=None):
         if serialized and self.serializer:
-            return self.serializer.load(serialized)
+            return self.serializer.load(serialized, session=session)
         else:
             return serialized
 
@@ -43,7 +42,7 @@ class NestedModelListField(Field):
         if self._serializer is None:
             self._serializer = ModelSerializer(declarative_class)
 
-    def load(self, serialized):
+    def load(self, serialized, session=None):
         if not serialized:
             return []
         class_mapper = self.serializer.model_class
@@ -54,8 +53,8 @@ class NestedModelListField(Field):
             if pk:
                 # Serialized object has a primary key, so we load an existing model from the database
                 # instead of creating one
-                existing_model = self.serializer.session.query.get(pk)
-                updated_model = self.serializer.load(item, existing_model)
+                existing_model = session.query.get(pk)
+                updated_model = self.serializer.load(item, existing_model, session=session)
                 models.append(updated_model)
             else:
                 # No primary key, just create a new model entity
@@ -82,7 +81,7 @@ class NestedModelField(Field):
         if self._serializer is None:
             self._serializer = ModelSerializer(declarative_class)
 
-    def load(self, serialized):
+    def load(self, serialized, session=None):
         if not serialized:
             return None
         class_mapper = self.serializer.model_class
@@ -91,11 +90,11 @@ class NestedModelField(Field):
         if pk:
             # Serialized object has a primary key, so we load an existing model from the database
             # instead of creating one
-            existing_model = self.serializer.session.query.get(pk)
-            return self.serializer.load(serialized, existing_model)
+            existing_model = session.query.get(pk)
+            return self.serializer.load(serialized, existing_model, session=session)
         else:
             # No primary key, just create a new model entity
-            return self.serializer.load(serialized)
+            return self.serializer.load(serialized, session=session)
 
 
 class NestedAttributesField(Field):
@@ -123,9 +122,8 @@ class NestedAttributesField(Field):
                 serialized[attr_name] = getattr(item, attr_name)
             return serialized
 
-        def load(self, serialized):
+        def load(self, serialized, session=None):
             raise NotImplementedError()
-
 
     def __init__(self, attributes: Union[tuple, dict], many=False):
         serializer = self.NestedAttributesSerializer(attributes, many)
@@ -144,9 +142,9 @@ class PrimaryKeyField(Field):
             self.declarative_class = declarative_class
             self._pk_column = get_model_pk(self.declarative_class)
 
-        def load(self, serialized):
+        def load(self, serialized, session=None):
             pk_column = self._pk_column
-            query_results = self.session.query(self.declarative_class).filter(pk_column.in_(serialized)).all()
+            query_results = session.query(self.declarative_class).filter(pk_column.in_(serialized)).all()
             if len(serialized) != len(query_results):
                 raise ValueError("Not all primary keys found for '{}'".format(self._pk_column))
             return query_results

@@ -8,7 +8,7 @@ class EnumSerializer(ColumnSerializer):
             return None
         return value.value
 
-    def load(self, serialized):
+    def load(self, serialized, session=None):
         enum = getattr(self.column.type, 'enum_class')
         return enum(serialized)
 

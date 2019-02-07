@@ -1,3 +1,6 @@
+from serialchemy.enumserializer import EnumSerializer, is_enum_field
+
+from .datetimeserializer import DateTimeSerializer, is_datetime_field
 from .fields import Field
 from .serializer import Serializer
 
@@ -15,9 +18,15 @@ class ModelSerializer(Serializer):
         self._fields = self._get_declared_fields()
         # Collect columns not declared in the serializer
         self.session = None
-        for column in self.model_columns.keys():
-            field = self._fields.setdefault(column, Field())
+        for column_name in self.model_columns.keys():
+            field = self._fields.setdefault(column_name, Field())
             # Set a serializer for fields that can not be serialized by default
+            if field.serializer is None:
+                column = self.model_columns[column_name]
+                if is_datetime_field(column):
+                    field._serializer = DateTimeSerializer(column)
+                elif is_enum_field(column):
+                    field._serializer = EnumSerializer(column)
 
     @property
     def model_class(self):
@@ -74,7 +83,7 @@ class ModelSerializer(Serializer):
                     field.serializer.session = session
                 else:
                     field.serializer.session = self.session
-            deserialized = field.load(value)
+            deserialized = field.load(value, session=session)
             setattr(model, field_name, deserialized)
         return model
 

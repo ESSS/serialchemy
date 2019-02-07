@@ -7,7 +7,7 @@ class Serializer(ABC):
     def dump(self, value): pass
 
     @abstractmethod
-    def load(self, serialized): pass
+    def load(self, serialized, session=None): pass
 
 
 class ColumnSerializer(Serializer):

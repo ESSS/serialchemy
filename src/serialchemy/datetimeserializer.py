@@ -1,5 +1,6 @@
 import re
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
+
 from sqlalchemy import DateTime
 
 from .serializer import ColumnSerializer
@@ -20,7 +21,7 @@ class DateTimeSerializer(ColumnSerializer):
     def dump(self, value):
         return value.isoformat()
 
-    def load(self, serialized):
+    def load(self, serialized, session=None):
         match = self.DATETIME_RE.match(serialized)
         if not match:
             raise ValueError("Could not parse DateTime: '{}'".format(serialized))
