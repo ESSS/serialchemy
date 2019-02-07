@@ -8,7 +8,7 @@ with io.open("README.rst", encoding="UTF-8") as readme_file:
 with io.open("CHANGELOG.rst", encoding="UTF-8") as changelog_file:
     history = changelog_file.read()
 
-requirements = []
+requirements = ["sqlalchemy>=1.1"]
 extras_require = {
     "docs": ["sphinx >= 1.4", "sphinx_rtd_theme", "sphinx-autodoc-typehints"],
     "testing": ["codecov", "pytest", "pytest-cov", "pytest-mock", "pre-commit", "tox"],
@@ -20,7 +20,7 @@ setuptools.setup(
         'Development Status :: 2 - Pre-Alpha',
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
     ],
@@ -30,7 +30,7 @@ setuptools.setup(
     license="MIT license",
     long_description=readme + "\n\n" + history,
     include_package_data=True,
-    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*",
+    python_requires=">=3.5",
     keywords="serialchemy",
     name="serialchemy",
     packages=setuptools.find_packages(where="src"),
