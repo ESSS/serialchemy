@@ -1,13 +1,17 @@
 language: python
+
 stages:
 - test
 - name: deploy
   if: repo = ESSS/serialchemy AND tag IS present
+
 install:
 - pip install -U pip
 - pip install -U tox
+
 script:
 - tox
+
 jobs:
   include:
   - python: '3.6'
@@ -15,17 +19,17 @@ jobs:
     
   - python: '3.6'
     env: TOXENV=docs
-    
-  - python: '2.7'
-    env: TOXENV=py27
-    
-  - python: '3.6'
-    env: TOXENV=py36
-    
+
   - python: '3.7'
     env: TOXENV=py37
     sudo: required
     dist: xenial
+
+  - python: '3.6'
+    env: TOXENV=py36
+
+  - python: '3.5'
+    env: TOXENV=py35
     
   - stage: deploy
     python: '3.6'
@@ -42,6 +46,7 @@ jobs:
         tags: true
         repo: ESSS/serialchemy
         python: 3.6
+
 branches:
   only:
   - master
