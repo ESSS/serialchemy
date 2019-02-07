@@ -18,3 +18,4 @@ dist/
 .eggs/
 .tox/
 docs/_build
+environment.yml
