@@ -21,6 +21,7 @@ setuptools.setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
     description="Serializers for SQLAlchemy models.",
     extras_require=extras_require,
