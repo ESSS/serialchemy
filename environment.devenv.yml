@@ -2,12 +2,12 @@ name: serialchemy
 
 dependencies:
   - python>=3.6
-  - sqlalchemy==1.2.1
-  - sqlalchemy-utc==0.10.0
-  - sqlalchemy-utils==0.33.6
+  - sqlalchemy>=1.2
+  - sqlalchemy-utc>=0.10
+  - sqlalchemy-utils>=0.33
   - pytest
   - pytest-datadir
-  - pytest-mock>=1.10.0
+  - pytest-mock>=1.10
 
 environment:
   PYTHONPATH:
