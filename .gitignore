@@ -13,9 +13,22 @@ dist/
 # Project settings
 .idea/
 .settings/
+.project
+.pydevproject
 
 .coverage
 .eggs/
 .tox/
 docs/_build
 environment.yml
+
+/docs/build/
+/_build/
+*.pytest_cache/
+*tmp/
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
