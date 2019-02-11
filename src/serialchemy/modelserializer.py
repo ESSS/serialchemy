@@ -1,7 +1,8 @@
-from serialchemy.enumserializer import EnumSerializer, is_enum_field
+from serialchemy.enumserializer import EnumSerializer
+from serialchemy.serializer_checks import is_datetime_column, is_enum_column
 
-from .datetimeserializer import DateTimeSerializer, is_datetime_field
-from .fields import Field
+from .datetimeserializer import DateTimeSerializer
+from .field import Field
 from .serializer import Serializer
 
 
@@ -10,6 +11,11 @@ class ModelSerializer(Serializer):
     Serializer for SQLAlchemy Declarative classes
     """
 
+    EXTRA_SERIALIZERS = [
+        (DateTimeSerializer, is_datetime_column),
+        (EnumSerializer, is_enum_column)
+    ]
+
     def __init__(self, model_class):
         """
         :param Type[DeclarativeMeta] model_class: the SQLAlchemy mapping class to be serialized
@@ -17,16 +23,14 @@ class ModelSerializer(Serializer):
         self._mapper_class = model_class
         self._fields = self._get_declared_fields()
         # Collect columns not declared in the serializer
-        self.session = None
-        for column_name in self.model_columns.keys():
+        for column_name, column in self.model_columns.items():
             field = self._fields.setdefault(column_name, Field())
-            # Set a serializer for fields that can not be serialized by default
             if field.serializer is None:
-                column = self.model_columns[column_name]
-                if is_datetime_field(column):
-                    field._serializer = DateTimeSerializer(column)
-                elif is_enum_field(column):
-                    field._serializer = EnumSerializer(column)
+                # If no serializer is defined, check if the column type has some serialized
+                # registered in EXTRA_SERIALIZERS.
+                for serializer_class, serializer_check in self.EXTRA_SERIALIZERS:
+                    if serializer_check(column):
+                        field._serializer = serializer_class(column)
 
     @property
     def model_class(self):
@@ -68,8 +72,12 @@ class ModelSerializer(Serializer):
 
         :param None|DeclarativeMeta existing_model: If given, the model will be updated with the serialized data.
 
+        :param None|Session session: a SQLAlchemy session. Used only to load nested models
+
         :rtype: DeclarativeMeta
         """
+        from .nested_fields import SessionBasedField
+
         if existing_model:
             model = existing_model
         else:
@@ -78,16 +86,17 @@ class ModelSerializer(Serializer):
             field = self._fields[field_name]
             if field.dump_only:
                 continue
-            if field.serializer:
-                if session:
-                    field.serializer.session = session
-                else:
-                    field.serializer.session = self.session
-            deserialized = field.load(value, session=session)
+            if isinstance(field, SessionBasedField):
+                deserialized = field.load(value, session=session)
+            else:
+                deserialized = field.load(value)
             setattr(model, field_name, deserialized)
         return model
 
-    def get_model_name(self) -> str:
+    def get_model_name(self):
+        """
+        :rtype: str
+        """
         return self._mapper_class.__name__
 
     @classmethod
@@ -103,3 +112,5 @@ class ModelSerializer(Serializer):
             if isinstance(value, Field):
                 fields[attr_name] = value
         return fields
+
+

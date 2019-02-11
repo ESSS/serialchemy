@@ -2,11 +2,10 @@
 Serialchemy
 ======================================================================
 
-
-.. image:: https://img.shields.io/pypi/v/serialchemy.svg
+.. TODO: Publish to PyPi
+    .. image:: https://img.shields.io/pypi/v/serialchemy.svg
     :target: https://pypi.python.org/pypi/serialchemy
-
-.. image:: https://img.shields.io/pypi/pyversions/serialchemy.svg
+    .. image:: https://img.shields.io/pypi/pyversions/serialchemy.svg
     :target: https://pypi.org/project/serialchemy
 
 .. image:: https://img.shields.io/travis/ESSS/serialchemy.svg
@@ -21,10 +20,96 @@ Serialchemy
 .. image:: https://img.shields.io/readthedocs/pip.svg
     :target: https://serialchemy.readthedocs.io/en/latest/
 
-What is Serialchemy ?
-================================================================================
+SQLAlchemy model serialization.
 
-Serializers for SQLAlchemy models.
+Motivation
+----------
+
+**Serialchemy** was developed as a module of Flask-RESTAlchemy_, a lib to create Restful APIs
+using Flask and SQLAlchemy. We first tried marshmallow-sqlalchemy_, probably the most
+well-known lib for SQLAlchemy model serialization, but we faced `issues related to nested
+models <https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/67>`_. We also think
+that is possible to build a simpler and more maintainable solution by having SQLAlchemy_ in
+mind from the ground up, as opposed to marshmallow-sqlalchemy_ that had to be
+designed and built on top of marshmallow_.
+
+.. _SQLAlchemy: www.sqlalchemy.org
+.. _marshmallow-sqlalchemy: http://marshmallow-sqlalchemy.readthedocs.io
+.. _marshmallow: https://marshmallow.readthedocs.io
+.. _Flask-RESTAlchemy: https://github.com/ESSS/flask-restalchemy
+
+How to Use it
+-------------
+
+Serializing Generic Types
+.........................
+
+Suppose we have an `Employee` SQLAlchemy_ model declared: ::
+
+    class Employee(Base):
+        __tablename__ = 'Employee'
+
+        id = Column(Integer, primary_key=True)
+        fullname = Column(String)
+        admission = Column(DateTime, default=datetime(2000, 1, 1))
+        company_id = Column(ForeignKey('Company.id'))
+        company = relationship(Company)
+        company_name = column_property(
+            select([Company.name]).where(Company.id == company_id)
+        )
+        password = Column(String)
+
+`Generic Types`_ are automatically serialized by `ModelSerializer`: ::
+
+    from serialchemy import ModelSerializer
+
+    emp = Employee(fullname='Roberto Silva', admission=datetime(2019, 4, 2))
+
+    serializer = ModelSerializer(Employee)
+    serializer.dump(emp)
+
+    >> {'id': None,
+        'fullname': 'Roberto Silva',
+        'admission': '2019-04-02T00:00:00',
+        'company_id': None,
+        'company_name': None,
+        'password': None
+        }
+
+New items can be deserialized by the same serializer: ::
+
+    new_employee = {'fullname': 'Jobson Gomes', 'admission': '2018-02-03'}
+    serializer.load(new_employee)
+    >> <Employee object at 0x000001C119DE3940>
+
+Serializers do not commit into the database. You must do this by yourself: ::
+
+    emp = serializer.load(new_employee)
+    session.add(emp)
+    session.commit()
+
+.. _`Generic Types`: https://docs.sqlalchemy.org/en/rel_1_2/core/type_basics.html#generic-types
+
+Custom Serializers
+..................
+
+For anything beyond `Generic Types`_ we must extend the `ModelSerializer` class: ::
+
+    class EmployeeSerializer(ModelSerializer):
+
+        password = Field(load_only=True)     # passwords should be only deserialized
+        company = NestedModelField(Company)  # dump company as nested object
+
+    serializer = EmployeeSerializer(Employee)
+    serializer.dump(emp)
+
+    >> {'id': 1,
+        'fullname': 'Roberto Silva',
+        'admission': '2019-04-02T00:00:00',
+        'company': {'id': 3,
+                    'name': 'Acme Co'
+                   }
+        }
 
 
 Contributing

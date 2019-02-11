@@ -11,7 +11,7 @@ with io.open("CHANGELOG.rst", encoding="UTF-8") as changelog_file:
 requirements = ["sqlalchemy>=1.1"]
 extras_require = {
     "docs": ["sphinx >= 1.4", "sphinx_rtd_theme", "sphinx-autodoc-typehints"],
-    "testing": ["codecov", "pytest", "pytest-cov", "pytest-mock", "pre-commit", "tox"],
+    "testing": ["codecov", "pytest", "pytest-cov", "pytest-regressions", "pre-commit", "tox"],
 }
 setuptools.setup(
     author='ESSS',

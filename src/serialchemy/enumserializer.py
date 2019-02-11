@@ -11,7 +11,3 @@ class EnumSerializer(ColumnSerializer):
     def load(self, serialized, session=None):
         enum = getattr(self.column.type, 'enum_class')
         return enum(serialized)
-
-
-def is_enum_field(col):
-    return hasattr(col.type, 'enum_class') and getattr(col.type, 'enum_class')
