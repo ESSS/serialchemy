@@ -3,7 +3,8 @@ import datetime
 import pytest
 
 from serialchemy._tests.sample_model import Address, Company, Department, Employee
-from serialchemy.fields import Field, NestedAttributesField, NestedModelField, PrimaryKeyField
+from serialchemy.field import Field
+from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
 from serialchemy.modelserializer import ModelSerializer
 
 
@@ -62,29 +63,25 @@ def seed_data(db_session):
     db_session.commit()
 
 
+def test_model_serializer(db_session, data_regression):
+    emp = db_session.query(Employee).get(1)
+    serializer = ModelSerializer(Employee)
+    serialized = serializer.dump(emp)
+    print(serialized)
+    data_regression.Check(serialized)
+
+
 @pytest.mark.parametrize("serializer_class",
     [EmployeeSerializerNestedModelFields, EmployeeSerializerNestedAttrsFields]
 )
-def test_serialization(serializer_class, db_session):
+def test_custom_serializer(serializer_class, db_session, data_regression):
     emp = db_session.query(Employee).get(1)
     serializer = serializer_class(Employee)
-    serialized_dict = serializer.dump(emp)
-    assert serialized_dict["firstname"] == emp.firstname
-    assert serialized_dict["lastname"] == emp.lastname
-    assert serialized_dict["created_at"] == "2000-01-02T00:00:00"
-    assert serialized_dict["company_id"] == 5
-    assert serialized_dict["company"]["name"] == "Terrans"
-    assert serialized_dict["company"]["location"] == "Korhal"
-
-    assert "password" not in serialized_dict
-    address = serialized_dict["address"]
-
-    assert address["id"] == 1
-    assert address["number"] == "943"
-    assert address["street"] == "5 Av"
+    serialized = serializer.dump(emp)
+    data_regression.check(serialized, basename="test_custom_serializer_{}".format(serializer_class.__name__))
 
 
-def test_deserialize_new_model(db_session):
+def test_deserialize_new_model(db_session, data_regression):
     serializer = EmployeeSerializerNestedModelFields(Employee)
     serialized = {
         "firstname": "John",
@@ -100,11 +97,7 @@ def test_deserialize_new_model(db_session):
         "created_at": "2023-12-21T00:00:00",
     }
     loaded_emp = serializer.load(serialized, session=db_session)
-    assert loaded_emp.firstname == serialized["firstname"]
-    assert loaded_emp.admission == datetime.datetime(2004, 6, 1, 0, 0)
-    assert loaded_emp.company_id == serialized["company_id"]
-    assert loaded_emp.address.number == "245"
-    assert loaded_emp.created_at is None
+    data_regression.check(serializer.dump(loaded_emp))
 
 
 def test_deserialize_existing_model(db_session):
@@ -127,22 +120,18 @@ def test_deserialize_existing_model(db_session):
     assert serialized["address"]["zip"] == loaded_emp.address.zip
 
 
-def test_one2one_pk_field(db_session):
+def test_one2one_pk_field(db_session, data_regression):
     serializer = EmployeeSerializerPrimaryKeyFields(Employee)
     employee = db_session.query(Employee).get(2)
     serialized = serializer.dump(employee)
-    assert serialized['firstname'] == 'Sarah'
-    assert serialized['address'] == 1
-    assert serialized['company'] == 5
+    data_regression.check(serialized)
 
 
-def test_one2many_pk_field(db_session):
+def test_one2many_pk_field(db_session, data_regression):
     serializer = CompanySerializer(Company)
     company = db_session.query(Company).get(5)
     serialized = serializer.dump(company)
-    assert serialized['name'] == 'Terrans'
-    assert len(serialized['employees']) == 2
-    assert serialized['employees'] == [1, 2]
+    data_regression.check(serialized)
 
     serialized['employees'] = [2, 3]
     company = serializer.load(serialized, existing_model=company, session=db_session)
