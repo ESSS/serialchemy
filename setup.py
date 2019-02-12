@@ -14,8 +14,11 @@ extras_require = {
     "testing": ["codecov", "pytest", "pytest-cov", "pytest-regressions", "pre-commit", "tox"],
 }
 setuptools.setup(
+    name="serialchemy",
+    description="Serializers for SQLAlchemy models.",
     author='ESSS',
     author_email='foss@esss.co',
+    version='0.1.0',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         "Intended Audience :: Developers",
@@ -23,7 +26,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
     ],
-    description="Serializers for SQLAlchemy models.",
     extras_require=extras_require,
     install_requires=requirements,
     license="MIT license",
@@ -31,7 +33,6 @@ setuptools.setup(
     include_package_data=True,
     python_requires=">=3.6",
     keywords="serialchemy",
-    name="serialchemy",
     packages=setuptools.find_packages(where="src"),
     package_dir={"": "src"},
     url="http://github.com/ESSS/serialchemy",
