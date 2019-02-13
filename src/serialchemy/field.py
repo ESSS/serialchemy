@@ -1,3 +1,4 @@
+from serialchemy.serializer import Serializer
 
 class Field(object):
     """
@@ -15,6 +16,8 @@ class Field(object):
         """
         self.dump_only = dump_only
         self.load_only = load_only
+        if serializer and not isinstance(serializer, Serializer): 
+            raise TypeError(f"'{serializer}' is not an instance of 'Serializer'")
         self._serializer = serializer
 
     @property
