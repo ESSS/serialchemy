@@ -4,8 +4,9 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, sel
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import column_property, object_session, relationship
 
-from serialchemy.fields import Field, NestedModelField, NestedModelListField
 from serialchemy.modelserializer import ModelSerializer
+from serialchemy.field import Field
+from serialchemy.nested_fields import NestedModelField, NestedModelListField
 
 Base = declarative_base()
 

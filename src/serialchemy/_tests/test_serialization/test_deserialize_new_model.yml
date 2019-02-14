@@ -1,0 +1,17 @@
+address:
+  city: null
+  id: null
+  number: '245'
+  state: null
+  street: 6 Av
+  zip: 88088-000
+address_id: null
+admission: '2004-06-01T00:00:00'
+company: null
+company_id: 5
+company_name: null
+created_at: null
+email: null
+firstname: John
+id: null
+lastname: Doe
