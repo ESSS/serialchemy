@@ -175,8 +175,11 @@ def get_model_pk_attr_name(model_class):
     """
     primary_keys = model_class.__mapper__.primary_key
     assert len(primary_keys) == 1, "Nested object must have exactly one primary key"
-    pk_name = primary_keys[0].key
-    return pk_name
+    for attr_name, col in model_class.__mapper__.columns.items():
+        if primary_keys[0] == col:
+            return attr_name
+    else:
+        raise RuntimeError(f"Couldn't find attribute for {primary_keys[0].key}")
 
 
 def get_model_pk_column(model_class):
