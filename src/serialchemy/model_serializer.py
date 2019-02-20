@@ -1,7 +1,7 @@
-from serialchemy.enumserializer import EnumSerializer
+from serialchemy.enum_serializer import EnumSerializer
 from serialchemy.serializer_checks import is_datetime_column, is_enum_column
 
-from .datetimeserializer import DateTimeSerializer
+from .datetime_serializer import DateTimeColumnSerializer
 from .field import Field
 from .serializer import Serializer
 
@@ -12,7 +12,7 @@ class ModelSerializer(Serializer):
     """
 
     EXTRA_SERIALIZERS = [
-        (DateTimeSerializer, is_datetime_column),
+        (DateTimeColumnSerializer, is_datetime_column),
         (EnumSerializer, is_enum_column)
     ]
 
@@ -42,7 +42,7 @@ class ModelSerializer(Serializer):
 
     @property
     def fields(self):
-        return self._fields.copy()
+        return self._fields
 
     def dump(self, model):
         """
@@ -81,7 +81,7 @@ class ModelSerializer(Serializer):
         if existing_model:
             model = existing_model
         else:
-            model = self._mapper_class()
+            model = self._create_model(serialized)
         for field_name, value in serialized.items():
             field = self._fields[field_name]
             if field.dump_only:
@@ -98,6 +98,16 @@ class ModelSerializer(Serializer):
         :rtype: str
         """
         return self._mapper_class.__name__
+
+    def _create_model(self, serialized):
+        """
+        Can be overridden in a derived class to customize model initialization.
+
+        :param dict serialized: the serialized object
+
+        :rtype: DeclarativeMeta
+        """
+        return self.model_class()
 
     @classmethod
     def _get_declared_fields(cls) -> dict:

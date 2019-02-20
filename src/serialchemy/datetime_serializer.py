@@ -1,10 +1,10 @@
 import re
 from datetime import datetime, timedelta, timezone
 
-from .serializer import ColumnSerializer
+from .serializer import Serializer, ColumnSerializer
 
 
-class DateTimeSerializer(ColumnSerializer):
+class DateTimeSerializer(Serializer):
     """
     Serializer for DateTime objects
     """
@@ -16,18 +16,20 @@ class DateTimeSerializer(ColumnSerializer):
 
     DATETIME_RE = re.compile(DATETIME_REGEX)
 
-    def dump(self, value):
+    @classmethod
+    def dump(cls, value):
         return value.isoformat()
 
-    def load(self, serialized, session=None):
-        match = self.DATETIME_RE.match(serialized)
+    @classmethod
+    def load(cls, serialized, session=None):
+        match = cls.DATETIME_RE.match(serialized)
         if not match:
             raise ValueError("Could not parse DateTime: '{}'".format(serialized))
         parts = match.groupdict()
         dt = datetime(
             int(parts["Y"]), int(parts["m"]), int(parts["d"]),
             int(parts["H"]), int(parts["M"]), int(parts.get("S") or 0), int(parts.get("f") or 0),
-            tzinfo=self._parse_tzinfo(parts["tz"])
+            tzinfo=cls._parse_tzinfo(parts["tz"])
         )
         return dt
 
@@ -44,3 +46,7 @@ class DateTimeSerializer(ColumnSerializer):
             if offset_str[0] == "-" and hours == 0:
                 minutes = -minutes
             return timezone(timedelta(hours=hours, minutes=minutes))
+
+
+class DateTimeColumnSerializer(DateTimeSerializer, ColumnSerializer):
+    pass

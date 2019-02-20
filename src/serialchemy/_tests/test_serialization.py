@@ -5,7 +5,7 @@ import pytest
 from serialchemy._tests.sample_model import Address, Company, Department, Employee
 from serialchemy.field import Field
 from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
-from serialchemy.modelserializer import ModelSerializer
+from serialchemy.model_serializer import ModelSerializer
 
 
 class EmployeeSerializerNestedModelFields(ModelSerializer):

@@ -4,7 +4,7 @@ from sqlalchemy.orm.dynamic import AppenderMixin
 
 from .field import Field
 from .serializer import Serializer
-from .modelserializer import ModelSerializer
+from .model_serializer import ModelSerializer
 
 
 class SessionBasedField(Field):
@@ -76,7 +76,7 @@ class NestedModelListField(SessionBasedField):
             if pk:
                 # Serialized object has a primary key, so we load an existing model from the database
                 # instead of creating one
-                existing_model = session.query.get(pk)
+                existing_model = session.query(class_mapper).get(pk)
                 updated_model = self.serializer.load(item, existing_model, session=session)
                 models.append(updated_model)
             else:
@@ -173,13 +173,13 @@ def get_model_pk_attr_name(model_class):
 
     :return: str: a Column name
     """
-    primary_keys = model_class.__mapper__.primary_key
-    assert len(primary_keys) == 1, "Nested object must have exactly one primary key"
-    for attr_name, col in model_class.__mapper__.columns.items():
-        if primary_keys[0] == col:
-            return attr_name
+    primary_key_columns = list(filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items()))
+    if len(primary_key_columns) == 1:
+        return primary_key_columns.pop()[0]
+    elif len(primary_key_columns) < 1:
+        raise RuntimeError(f"Couldn't find attribute for {model_class}")
     else:
-        raise RuntimeError(f"Couldn't find attribute for {primary_keys[0].key}")
+        raise RuntimeError("Multiple primary keys still not supported")
 
 
 def get_model_pk_column(model_class):
