@@ -45,7 +45,7 @@ class NestedModelField(SessionBasedField):
         class_mapper = self.serializer.model_class
         pk_attr = get_model_pk_attr_name(class_mapper)
         pk = serialized.get(pk_attr)
-        if pk:
+        if pk and session:
             # Serialized object has a primary key, so we load an existing model from the database
             # instead of creating one
             existing_model = session.query(class_mapper).get(pk)
@@ -73,7 +73,7 @@ class NestedModelListField(SessionBasedField):
         models = []
         for item in serialized:
             pk = item.get(pk_attr)
-            if pk:
+            if pk and session:
                 # Serialized object has a primary key, so we load an existing model from the database
                 # instead of creating one
                 existing_model = session.query(class_mapper).get(pk)
