@@ -23,14 +23,8 @@ class ModelSerializer(Serializer):
         self._mapper_class = model_class
         self._fields = self._get_declared_fields()
         # Collect columns not declared in the serializer
-        for column_name, column in self.model_columns.items():
-            field = self._fields.setdefault(column_name, Field())
-            if field.serializer is None:
-                # If no serializer is defined, check if the column type has some serialized
-                # registered in EXTRA_SERIALIZERS.
-                for serializer_class, serializer_check in self.EXTRA_SERIALIZERS:
-                    if serializer_check(column):
-                        field._serializer = serializer_class(column)
+        for column_name in self.model_columns.keys():
+            self._fields.setdefault(column_name, Field())
 
     @property
     def model_class(self):
@@ -58,6 +52,8 @@ class ModelSerializer(Serializer):
                 continue
             value = getattr(model, attr) if hasattr(model, attr) else None
             if field:
+                if field.serializer is None:
+                    self._create_field_serializer(field, self.model_columns[attr])
                 serialized = field.dump(value)
             else:
                 serialized = value
@@ -86,6 +82,8 @@ class ModelSerializer(Serializer):
             field = self._fields[field_name]
             if field.dump_only:
                 continue
+            if field.serializer is None:
+                self._create_field_serializer(field, self.model_columns[field_name])
             if isinstance(field, SessionBasedField):
                 deserialized = field.load(value, session=session)
             else:
@@ -108,6 +106,19 @@ class ModelSerializer(Serializer):
         :rtype: DeclarativeMeta
         """
         return self.model_class()
+
+    def _create_field_serializer(self, field, column):
+        """
+        If no serializer is defined, check if the column type has some serialized
+        registered in EXTRA_SERIALIZERS.
+
+        :param Field field: the field which has no serializer
+
+        :param Column column: a sqlalchemy column where no serializer is defined
+        """
+        for serializer_class, serializer_check in self.EXTRA_SERIALIZERS:
+            if serializer_check(column):
+                field._serializer = serializer_class(column)
 
     @classmethod
     def _get_declared_fields(cls) -> dict:
