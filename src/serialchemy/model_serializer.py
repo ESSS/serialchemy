@@ -50,11 +50,9 @@ class ModelSerializer(Serializer):
         for attr, field in self._fields.items():
             if field.load_only:
                 continue
-            value = getattr(model, attr) if hasattr(model, attr) else None
+            value = getattr(model, attr, None)
             if field:
-                column = self.model_columns.get(attr)
-                if field.serializer is None and column is not None:
-                    self._create_field_serializer(field, column)
+                self._assign_default_field_serializer(field, attr)
                 serialized = field.dump(value)
             else:
                 serialized = value
@@ -83,10 +81,7 @@ class ModelSerializer(Serializer):
             field = self._fields[field_name]
             if field.dump_only:
                 continue
-
-            column = self.model_columns.get(field_name)
-            if field.serializer is None and column is not None:
-                self._create_field_serializer(field, column)
+            self._assign_default_field_serializer(field, field_name)
             if isinstance(field, SessionBasedField):
                 deserialized = field.load(value, session=session)
             else:
@@ -110,18 +105,20 @@ class ModelSerializer(Serializer):
         """
         return self.model_class()
 
-    def _create_field_serializer(self, field, column):
+    def _assign_default_field_serializer(self, field, column_name):
         """
         If no serializer is defined, check if the column type has some serialized
         registered in EXTRA_SERIALIZERS.
 
-        :param Field field: the field which has no serializer
+        :param Field field: the field to assign default serializer
 
-        :param Column column: a sqlalchemy column where no serializer is defined
+        :param str column_name: sqlalchemy column name on model
         """
-        for serializer_class, serializer_check in self.EXTRA_SERIALIZERS:
-            if serializer_check(column):
-                field._serializer = serializer_class(column)
+        column = self.model_columns.get(column_name)
+        if field.serializer is None and column is not None:
+            for serializer_class, serializer_check in self.EXTRA_SERIALIZERS:
+                if serializer_check(column):
+                    field._serializer = serializer_class(column)
 
     @classmethod
     def _get_declared_fields(cls) -> dict:
