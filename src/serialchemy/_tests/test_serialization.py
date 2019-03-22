@@ -1,5 +1,3 @@
-import datetime
-
 import pytest
 
 from serialchemy._tests.sample_model import Address, Company, Department, Employee
@@ -42,6 +40,10 @@ class EmployeeSerializerMixedFields(ModelSerializer):
     company = NestedModelField(Company)
     department = PrimaryKeyField(Department)
 
+
+class EmployeeSerializerHybridProperty(ModelSerializer):
+
+    full_name = Field(dump_only=True)
 
 class CompanySerializer(ModelSerializer):
 
@@ -145,3 +147,8 @@ def test_empty_nested(db_session):
     assert serialized['company'] is None
     model = serializer.load(serialized, session=db_session)
     assert model.company is None
+
+def test_property_serialization(db_session):
+    serializer = EmployeeSerializerHybridProperty(Employee)
+    serialized = serializer.dump(db_session.query(Employee).get(2))
+    assert serialized['full_name'] is not None

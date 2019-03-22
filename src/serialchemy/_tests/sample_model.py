@@ -7,6 +7,7 @@ from sqlalchemy.orm import column_property, object_session, relationship
 from serialchemy.model_serializer import ModelSerializer
 from serialchemy.field import Field
 from serialchemy.nested_fields import NestedModelField, NestedModelListField
+from sqlalchemy.ext.hybrid import hybrid_property
 
 Base = declarative_base()
 
@@ -85,6 +86,10 @@ class Employee(Base):
     @property
     def colleagues(self):
         return object_session(self).query(Employee).filter(Employee.company_id == self.company_id)
+
+    @hybrid_property
+    def full_name(self):
+        return " ".join([self.firstname, self.lastname]) 
 
 
 employee_department = Table('employee_department', Base.metadata,
