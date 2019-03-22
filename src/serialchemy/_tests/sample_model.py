@@ -89,7 +89,7 @@ class Employee(Base):
 
     @hybrid_property
     def full_name(self):
-        return " ".join([self.firstname, self.lastname]) 
+        return " ".join([self.firstname, self.lastname])
 
 
 employee_department = Table('employee_department', Base.metadata,
