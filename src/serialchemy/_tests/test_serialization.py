@@ -43,6 +43,11 @@ class EmployeeSerializerMixedFields(ModelSerializer):
     department = PrimaryKeyField(Department)
 
 
+class EmployeeSerializerProtectedField(ModelSerializer):
+
+    _role = Field()
+
+
 class CompanySerializer(ModelSerializer):
 
     employees = PrimaryKeyField(Employee)
@@ -51,7 +56,7 @@ class CompanySerializer(ModelSerializer):
 @pytest.fixture(autouse=True)
 def seed_data(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
-    emp1 = Employee(id=1, firstname='Jim', lastname='Raynor', company=company)
+    emp1 = Employee(id=1, firstname='Jim', lastname='Raynor', _salary=400, _role='Senior', company=company)
     emp2 = Employee(id=2, firstname='Sarah', lastname='Kerrigan', company=company)
     emp3 = Employee(id=3, firstname='Tychus', lastname='Findlay')
 
@@ -145,3 +150,17 @@ def test_empty_nested(db_session):
     assert serialized['company'] is None
     model = serializer.load(serialized, session=db_session)
     assert model.company is None
+
+
+def test_protected_field_default_creation(db_session):
+
+    serializer = EmployeeSerializerProtectedField(Employee)
+    employee = db_session.query(Employee).get(1)
+    assert employee._salary == 400
+    serialized = serializer.dump(employee)
+    assert serialized.get('_salary') is None
+    assert serialized.get('_role') == 'Senior'
+
+    model = serializer.load(serialized, session=db_session)
+    assert model._salary is None
+    assert model._role == 'Senior'

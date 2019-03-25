@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import column_property, object_session, relationship
 
@@ -78,6 +78,8 @@ class Employee(Base):
     address = relationship(Address)
     departments = relationship('Department', secondary='employee_department')
     contacts = relationship(Contact, cascade='all, delete-orphan')
+    _salary = Column(Float)
+    _role = Column(String)
 
     password = Column(String)
     created_at = Column(DateTime, default=datetime(2000, 1, 2))
