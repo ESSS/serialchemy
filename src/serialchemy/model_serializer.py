@@ -24,6 +24,8 @@ class ModelSerializer(Serializer):
         self._fields = self._get_declared_fields()
         # Collect columns not declared in the serializer
         for column_name, column in self.model_columns.items():
+            if column_name.startswith('_'):
+                continue
             field = self._fields.setdefault(column_name, Field())
             if field.serializer is None:
                 # If no serializer is defined, check if the column type has some serialized
@@ -116,8 +118,6 @@ class ModelSerializer(Serializer):
         if cls is ModelSerializer:
             return fields
         for attr_name in dir(cls):
-            if attr_name.startswith('_'):
-                continue
             value = getattr(cls, attr_name)
             if isinstance(value, Field):
                 fields[attr_name] = value
