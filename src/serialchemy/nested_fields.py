@@ -90,10 +90,7 @@ class NestedModelListField(SessionBasedField):
         return models
 
     def dump(self, value):
-        if value and self.serializer:
-            return [self.serializer.dump(item) for item in value]
-        else:
-            return value
+        return [self.serializer.dump(item) for item in value] if value is not None else []
 
 
 class NestedAttributesField(Field):
