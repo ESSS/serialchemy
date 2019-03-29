@@ -1,12 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import column_property, object_session, relationship
 
 from serialchemy.model_serializer import ModelSerializer
 from serialchemy.field import Field
 from serialchemy.nested_fields import NestedModelField, NestedModelListField
+from sqlalchemy.ext.hybrid import hybrid_property
 
 Base = declarative_base()
 
@@ -78,6 +79,8 @@ class Employee(Base):
     address = relationship(Address)
     departments = relationship('Department', secondary='employee_department')
     contacts = relationship(Contact, cascade='all, delete-orphan')
+    _salary = Column(Float)
+    _role = Column(String)
 
     password = Column(String)
     created_at = Column(DateTime, default=datetime(2000, 1, 2))
@@ -85,6 +88,10 @@ class Employee(Base):
     @property
     def colleagues(self):
         return object_session(self).query(Employee).filter(Employee.company_id == self.company_id)
+
+    @hybrid_property
+    def full_name(self):
+        return " ".join([self.firstname, self.lastname])
 
 
 employee_department = Table('employee_department', Base.metadata,

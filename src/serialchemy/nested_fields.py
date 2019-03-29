@@ -48,6 +48,8 @@ class NestedModelField(SessionBasedField):
         if pk:
             # Serialized object has a primary key, so we load an existing model from the database
             # instead of creating one
+            if session is None:
+                raise RuntimeError("Session object is required to deserialize a nested object")
             existing_model = session.query(class_mapper).get(pk)
             return self.serializer.load(serialized, existing_model, session=session)
         else:
@@ -76,6 +78,8 @@ class NestedModelListField(SessionBasedField):
             if pk:
                 # Serialized object has a primary key, so we load an existing model from the database
                 # instead of creating one
+                if session is None:
+                    raise RuntimeError("Session object is required to deserialize a nested object")
                 existing_model = session.query(class_mapper).get(pk)
                 updated_model = self.serializer.load(item, existing_model, session=session)
                 models.append(updated_model)
@@ -86,10 +90,7 @@ class NestedModelListField(SessionBasedField):
         return models
 
     def dump(self, value):
-        if value and self.serializer:
-            return [self.serializer.dump(item) for item in value]
-        else:
-            return value
+        return [self.serializer.dump(item) for item in value] if value is not None else []
 
 
 class NestedAttributesField(Field):
