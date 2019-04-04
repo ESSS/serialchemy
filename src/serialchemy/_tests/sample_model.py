@@ -108,10 +108,10 @@ employee_department = Table('employee_department', Base.metadata,
 class Engineer(Employee):
 
     __tablename__ = 'Engineer'
-    
+
     id = Column(Integer, ForeignKey('Employee.id'), primary_key=True)
     engineer_name = Column(String(30))
-    
+
     __mapper_args__ = {
         'polymorphic_identity':'Engineer',
     }
@@ -127,7 +127,7 @@ class Manager(Employee):
     __mapper_args__ = {
         'polymorphic_identity':'Manager',
     }
-    
+
 
 class EmployeeSerializer(ModelSerializer):
 

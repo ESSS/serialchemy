@@ -56,7 +56,7 @@ class EmployeeInheritedModelSerializer(InheritedModelSerializer):
 
     password = Field(load_only=True)
     created_at = Field(dump_only=True)
-    
+
 
 class CompanySerializer(ModelSerializer):
 
@@ -179,7 +179,7 @@ def test_protected_field_default_creation(db_session):
     model = serializer.load(serialized, session=db_session)
     assert model.role == 'Manager'
     assert model._salary is None
-    
+
 
 def test_inherited_model_serialization(db_session):
 
