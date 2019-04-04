@@ -4,7 +4,7 @@ from serialchemy._tests.sample_model import Address, Company, Department, Employ
 from serialchemy.field import Field
 from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
 from serialchemy.model_serializer import ModelSerializer
-from serialchemy.inheritedmodel_serializer import InheritedModelSerializer
+from serialchemy.polymorphic_serializer import PolymorphicModelSerializer
 
 
 class EmployeeSerializerNestedModelFields(ModelSerializer):
@@ -52,7 +52,7 @@ class EmployeeSerializerProtectedField(ModelSerializer):
     _role = Field()
 
 
-class EmployeeInheritedModelSerializer(InheritedModelSerializer):
+class EmployeeInheritedModelSerializer(PolymorphicModelSerializer):
 
     password = Field(load_only=True)
     created_at = Field(dump_only=True)
@@ -183,7 +183,7 @@ def test_protected_field_default_creation(db_session):
 
 def test_inherited_model_serialization(db_session):
 
-    serializer = EmployeeInheritedModelSerializer(Employee)
+    serializer = PolymorphicModelSerializer(Employee)
 
     manager = db_session.query(Employee).get(1)
     assert isinstance(manager, Manager)

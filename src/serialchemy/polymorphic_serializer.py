@@ -22,7 +22,7 @@ def class_identity_key(cls):
     return class_identity_key
 
 
-class InheritedModelSerializer(ModelSerializer):
+class PolymorphicModelSerializer(ModelSerializer):
     """
     Serializer for models that have a common base class. Can be used as serializer for objects
     from different classes (but have a common base)
