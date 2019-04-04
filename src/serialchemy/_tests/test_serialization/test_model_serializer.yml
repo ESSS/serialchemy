@@ -8,3 +8,4 @@ firstname: Jim
 id: 1
 lastname: Raynor
 password: null
+role: Manager

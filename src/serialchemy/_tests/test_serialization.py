@@ -1,9 +1,10 @@
 import pytest
 
-from serialchemy._tests.sample_model import Address, Company, Department, Employee
+from serialchemy._tests.sample_model import Address, Company, Department, Employee, Manager, Engineer
 from serialchemy.field import Field
 from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
 from serialchemy.model_serializer import ModelSerializer
+from serialchemy.inheritedmodel_serializer import InheritedModelSerializer
 
 
 class EmployeeSerializerNestedModelFields(ModelSerializer):
@@ -51,6 +52,12 @@ class EmployeeSerializerProtectedField(ModelSerializer):
     _role = Field()
 
 
+class EmployeeInheritedModelSerializer(InheritedModelSerializer):
+
+    password = Field(load_only=True)
+    created_at = Field(dump_only=True)
+    
+
 class CompanySerializer(ModelSerializer):
 
     employees = PrimaryKeyField(Employee)
@@ -59,8 +66,8 @@ class CompanySerializer(ModelSerializer):
 @pytest.fixture(autouse=True)
 def seed_data(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
-    emp1 = Employee(id=1, firstname='Jim', lastname='Raynor', _salary=400, _role='Senior', company=company)
-    emp2 = Employee(id=2, firstname='Sarah', lastname='Kerrigan', company=company)
+    emp1 = Manager(id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company)
+    emp2 = Engineer(id=2, firstname='Sarah', lastname='Kerrigan', role='Engineer', company=company)
     emp3 = Employee(id=3, firstname='Tychus', lastname='Findlay')
 
     addr1 = Address(street="5 Av", number="943", city="Tarsonis")
@@ -166,9 +173,30 @@ def test_protected_field_default_creation(db_session):
     employee = db_session.query(Employee).get(1)
     assert employee._salary == 400
     serialized = serializer.dump(employee)
+    assert serialized.get('role') == 'Manager'
     assert serialized.get('_salary') is None
-    assert serialized.get('_role') == 'Senior'
 
     model = serializer.load(serialized, session=db_session)
+    assert model.role == 'Manager'
     assert model._salary is None
-    assert model._role == 'Senior'
+    
+
+def test_inherited_model_serialization(db_session):
+
+    serializer = EmployeeInheritedModelSerializer(Employee)
+
+    manager = db_session.query(Employee).get(1)
+    assert isinstance(manager, Manager)
+
+    serialized = serializer.dump(manager)
+    assert serialized.get('role') == 'Manager'
+    model = serializer.load(serialized, session=db_session)
+    assert hasattr(model, 'manager_name')
+
+    engineer = db_session.query(Employee).get(2)
+    assert isinstance(engineer, Engineer)
+
+    serialized = serializer.dump(engineer)
+    assert serialized.get('role') == 'Engineer'
+    model = serializer.load(serialized, session=db_session)
+    assert hasattr(model, 'engineer_name')
