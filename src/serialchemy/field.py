@@ -25,7 +25,7 @@ class Field(object):
         return self._serializer
 
     def dump(self, value):
-        if value and self.serializer:
+        if value is not None and self.serializer:
             return self.serializer.dump(value)
         else:
             return value
