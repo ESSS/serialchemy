@@ -14,6 +14,10 @@ def is_datetime_column(col):
     else:
         return type(col.type) is DateTime
 
+def is_date_column(col):
+    from sqlalchemy import Date
+    return type(col.type) is Date
+
 
 def is_enum_column(col):
     return hasattr(col.type, 'enum_class') and getattr(col.type, 'enum_class')
