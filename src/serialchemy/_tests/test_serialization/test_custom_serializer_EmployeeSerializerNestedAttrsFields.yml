@@ -16,3 +16,4 @@ email: null
 firstname: Jim
 id: 1
 lastname: Raynor
+role: Manager

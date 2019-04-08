@@ -85,7 +85,7 @@ class NestedModelListField(SessionBasedField):
                 models.append(updated_model)
             else:
                 # No primary key, just create a new model entity
-                model = self.serializer.load(item)
+                model = self.serializer.load(item, session=session)
                 models.append(model)
         return models
 
