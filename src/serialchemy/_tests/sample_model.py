@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import column_property, object_session, relationship
 
@@ -79,9 +79,16 @@ class Employee(Base):
     address = relationship(Address)
     departments = relationship('Department', secondary='employee_department')
     contacts = relationship(Contact, cascade='all, delete-orphan')
+    role = Column(String)
+    _salary = Column(Float)
 
     password = Column(String)
     created_at = Column(DateTime, default=datetime(2000, 1, 2))
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'Employee',
+        'polymorphic_on': role
+    }
 
     @property
     def colleagues(self):
@@ -96,6 +103,30 @@ employee_department = Table('employee_department', Base.metadata,
     Column('employee_id', Integer, ForeignKey('Employee.id')),
     Column('department_id', Integer, ForeignKey('Department.id'))
 )
+
+
+class Engineer(Employee):
+
+    __tablename__ = 'Engineer'
+
+    id = Column(Integer, ForeignKey('Employee.id'), primary_key=True)
+    engineer_name = Column(String(30))
+
+    __mapper_args__ = {
+        'polymorphic_identity':'Engineer',
+    }
+
+
+class Manager(Employee):
+
+    __tablename__ = 'Manager'
+
+    id = Column(Integer, ForeignKey('Employee.id'), primary_key=True)
+    manager_name = Column(String(30))
+
+    __mapper_args__ = {
+        'polymorphic_identity':'Manager',
+    }
 
 
 class EmployeeSerializer(ModelSerializer):

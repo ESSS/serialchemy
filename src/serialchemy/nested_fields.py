@@ -85,15 +85,12 @@ class NestedModelListField(SessionBasedField):
                 models.append(updated_model)
             else:
                 # No primary key, just create a new model entity
-                model = self.serializer.load(item)
+                model = self.serializer.load(item, session=session)
                 models.append(model)
         return models
 
     def dump(self, value):
-        if value and self.serializer:
-            return [self.serializer.dump(item) for item in value]
-        else:
-            return value
+        return [self.serializer.dump(item) for item in value] if value is not None else []
 
 
 class NestedAttributesField(Field):

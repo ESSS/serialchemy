@@ -6,9 +6,6 @@ environment:
       TOXENV: "linting"
 
     - PYTHON: "C:\\Python36"
-      TOXENV: "docs"
-
-    - PYTHON: "C:\\Python36"
       TOXENV: "py36"
 
     - PYTHON: "C:\\Python37"
