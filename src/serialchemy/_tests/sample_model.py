@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select, Float
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import column_property, object_session, relationship
 
@@ -69,7 +69,7 @@ class Employee(Base):
     firstname = Column(String)
     lastname = Column(String)
     email = Column(String)
-    admission = Column(DateTime, default=datetime(2000, 1, 1))
+    admission = Column(Date, default=datetime(2000, 1, 1))
     company_id = Column(ForeignKey('Company.id'))
     company = relationship(Company, back_populates='employees')
     company_name = column_property(

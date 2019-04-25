@@ -1,6 +1,6 @@
 address: 1
 address_id: 1
-admission: '2000-01-01T00:00:00'
+admission: '2000-01-01'
 company: 5
 company_id: 5
 company_name: Terrans

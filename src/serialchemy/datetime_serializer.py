@@ -64,3 +64,6 @@ class DateSerializer(DateTimeSerializer):
 
 class DateTimeColumnSerializer(DateTimeSerializer, ColumnSerializer):
     pass
+
+class DateColumnSerializer(DateSerializer, ColumnSerializer):
+    pass

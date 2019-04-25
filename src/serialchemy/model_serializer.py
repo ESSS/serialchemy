@@ -3,7 +3,7 @@ import warnings
 from serialchemy.enum_serializer import EnumSerializer
 from serialchemy.serializer_checks import is_datetime_column, is_enum_column, is_date_column
 
-from .datetime_serializer import DateTimeColumnSerializer
+from .datetime_serializer import DateTimeColumnSerializer, DateColumnSerializer
 from .field import Field
 from .serializer import Serializer
 
@@ -15,7 +15,7 @@ class ModelSerializer(Serializer):
 
     EXTRA_SERIALIZERS = [
         (DateTimeColumnSerializer, is_datetime_column),
-        (DateTimeColumnSerializer, is_date_column),
+        (DateColumnSerializer, is_date_column),
         (EnumSerializer, is_enum_column)
     ]
 
