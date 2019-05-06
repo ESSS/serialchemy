@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 
 from serialchemy._tests.sample_model import Address, Company, Department, Employee, Manager, Engineer
@@ -84,6 +86,9 @@ def test_model_serializer(db_session, data_regression):
     serialized = serializer.dump(emp)
     print(serialized)
     data_regression.Check(serialized)
+
+    model: Employee = serializer.load(serialized)
+    assert model.admission == datetime.date(2000, 1, 1)
 
 
 @pytest.mark.parametrize("serializer_class",

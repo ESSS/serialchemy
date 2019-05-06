@@ -6,7 +6,7 @@ address:
   street: 5 Av
   zip: null
 address_id: 1
-admission: '2000-01-01T00:00:00'
+admission: '2000-01-01'
 company:
   id: 5
   location: Korhal
