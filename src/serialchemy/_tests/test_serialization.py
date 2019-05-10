@@ -65,6 +65,13 @@ class CompanySerializer(ModelSerializer):
     employees = PrimaryKeyField(Employee)
 
 
+class EmployeeSerializerCreationOnlyField(ModelSerializer):
+
+    password = Field(load_only=True)
+    created_at = Field(dump_only=True)
+    email = Field(creation_only=True)
+
+
 @pytest.fixture(autouse=True)
 def seed_data(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
@@ -205,3 +212,33 @@ def test_inherited_model_serialization(db_session):
     assert serialized.get('role') == 'Engineer'
     model = serializer.load(serialized, session=db_session)
     assert hasattr(model, 'engineer_name')
+
+
+def test_creation_only_flag(db_session):
+
+    serializer = EmployeeSerializerCreationOnlyField(Employee)
+
+    serialized = {
+        "password": "some",
+        "email": "spoc@cap.co",
+        "firstname": "Spock"
+    }
+
+    employee: Employee = serializer.load(serialized)
+    db_session.add(employee)
+    db_session.commit()
+
+    assert employee.id is not None
+    assert employee.email == 'spoc@cap.co'
+    assert employee.firstname == 'Spock'
+
+    serialized = {
+        "password": "some",
+        "email": "other_spoc@cap.co",
+        "firstname": "Other Spock"
+    }
+
+    changed_employee: Employee = serializer.load(serialized, existing_model=employee)
+
+    assert changed_employee.email == 'spoc@cap.co'
+    assert employee.firstname == 'Other Spock'

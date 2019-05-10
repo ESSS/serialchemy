@@ -89,6 +89,8 @@ class ModelSerializer(Serializer):
             field = self._fields[field_name]
             if field.dump_only:
                 continue
+            if field.creation_only and existing_model:
+                continue
             self._assign_default_field_serializer(field, field_name)
             if isinstance(field, SessionBasedField):
                 deserialized = field.load(value, session=session)
