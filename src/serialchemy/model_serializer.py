@@ -82,6 +82,7 @@ class ModelSerializer(Serializer):
             model = existing_model
         else:
             model = self._create_model(serialized)
+            assert model is not None, "ModelSerializer._create_model cannot return None"
         for field_name, value in serialized.items():
             if field_name not in self._fields:
                 warnings.warn(f"Field '{field_name}' not defined for {self._mapper_class.__name__}")
