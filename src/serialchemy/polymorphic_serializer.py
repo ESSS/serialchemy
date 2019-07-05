@@ -14,7 +14,7 @@ def _get_identity_key(cls):
     return identityColumn.key
 
 
-def isSQLAlchemyPolymorphic(cls):
+def is_sqlalchemy_polymorphic(cls):
     return hasattr(cls, '__mapper_args__') and cls.__mapper_args__.get('polymorphic_on') is not None
 
 
@@ -27,7 +27,7 @@ class PolymorphicModelSerializer(ModelSerializer):
     def __init__(self, declarative_class):
         super().__init__(declarative_class)
 
-        if isSQLAlchemyPolymorphic(declarative_class):
+        if is_sqlalchemy_polymorphic(declarative_class):
             self.is_polymorphic = True
             self.sub_serializers = self._get_sub_serializers(declarative_class)
             self.identity_key = _get_identity_key(declarative_class)
