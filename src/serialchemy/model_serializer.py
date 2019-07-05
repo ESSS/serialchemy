@@ -31,6 +31,9 @@ class ModelSerializer(Serializer):
                 continue
             self._fields.setdefault(column_name, Field())
 
+        for composite_name in self.model_composites.keys():
+            self._fields.setdefault(composite_name, Field())
+
     @property
     def model_class(self):
         return self._mapper_class
@@ -38,6 +41,10 @@ class ModelSerializer(Serializer):
     @property
     def model_columns(self):
         return self._mapper_class.__mapper__.c
+
+    @property
+    def model_composites(self):
+        return self._mapper_class.__mapper__.composites
 
     @property
     def fields(self):
