@@ -2,6 +2,10 @@
 History
 =======
 
+0.3.0 (2019-17-07)
+------------------
+* Add the composite fields to list of properties of model, to serialize that fields if it type is in EXTRA_SERIALIZERS.
+
 0.2.0 (2019-03-22)
 ------------------
 
