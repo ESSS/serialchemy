@@ -132,7 +132,7 @@ class ModelSerializer(Serializer):
         for attribute_name, attribute in self.model_properties.items():
             if attribute_name.startswith('_'):
                 continue
-            if attribute.foreign_keys and nest_foreign_keys:
+            if nest_foreign_keys and attribute.foreign_keys:
                 field_name, nested_field = self._create_nested_field_from_foreign_key(attribute)
                 self._fields.setdefault(field_name, nested_field)
             else:
