@@ -4,6 +4,7 @@ import pytest
 
 from serialchemy._tests.sample_model import Address, Company, Department, Employee, Manager, Engineer
 from serialchemy.field import Field
+from serialchemy.func import dump
 from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
 from serialchemy.model_serializer import ModelSerializer
 from serialchemy.polymorphic_serializer import PolymorphicModelSerializer
@@ -87,15 +88,23 @@ def seed_data(db_session):
     db_session.commit()
 
 
-def test_model_serializer(db_session, data_regression):
+def test_model_dump(db_session, data_regression):
     emp = db_session.query(Employee).get(1)
     serializer = ModelSerializer(Employee)
     serialized = serializer.dump(emp)
-    print(serialized)
     data_regression.Check(serialized)
 
-    model: Employee = serializer.load(serialized)
-    assert model.admission == datetime.date(2000, 1, 1)
+
+def test_model_load(data_regression):
+    serializer = ModelSerializer(Employee)
+    employee_dict = {
+        "firstname": "Sarah",
+        "lastname": "Kerrigan",
+        "email": "sarahk@blitz.com",
+        "admission": "2152-01-02T00:00:00"
+    }
+    model = serializer.load(employee_dict)
+    data_regression.Check(dump(model))
 
 
 @pytest.mark.parametrize("serializer_class",
@@ -108,7 +117,7 @@ def test_custom_serializer(serializer_class, db_session, data_regression):
     data_regression.check(serialized, basename="test_custom_serializer_{}".format(serializer_class.__name__))
 
 
-def test_deserialize_new_model(db_session, data_regression):
+def test_deserialize_with_custom_serializer(db_session, data_regression):
     serializer = EmployeeSerializerNestedModelFields(Employee)
     serialized = {
         "firstname": "John",

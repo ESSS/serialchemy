@@ -1,5 +1,7 @@
 import warnings
 
+from sqlalchemy.ext.declarative import DeclarativeMeta
+
 from serialchemy.enum_serializer import EnumSerializer
 from serialchemy.serializer_checks import is_datetime_column, is_enum_column, is_date_column
 
@@ -19,29 +21,25 @@ class ModelSerializer(Serializer):
         (EnumSerializer, is_enum_column)
     ]
 
-    def __init__(self, model_class):
+    def __init__(self, model_class, nest_foreign_keys=False):
         """
         :param Type[DeclarativeMeta] model_class: the SQLAlchemy mapping class to be serialized
         """
-        self._mapper_class = model_class
+        self._model_class = model_class
         self._fields = self._get_declared_fields()
-        # Collect columns not declared in the serializer
-        for property_name in self.model_properties.keys():
-            if property_name.startswith('_'):
-                continue
-            self._fields.setdefault(property_name, Field())
+        self._initialize_fields(nest_foreign_keys)
 
     @property
     def model_class(self):
-        return self._mapper_class
+        return self._model_class
 
     @property
     def model_columns(self):
-        return self._mapper_class.__mapper__.c
+        return self._model_class.__mapper__.c
 
     @property
     def model_composites(self):
-        return self._mapper_class.__mapper__.composites
+        return self._model_class.__mapper__.composites
 
     @property
     def model_properties(self):
@@ -70,7 +68,7 @@ class ModelSerializer(Serializer):
                 continue
             value = getattr(model, attr, None)
             if field:
-                self._assign_default_field_serializer(field, attr)
+                self._assign_default_serializer(field, attr)
                 serialized = field.dump(value)
             else:
                 serialized = value
@@ -79,15 +77,13 @@ class ModelSerializer(Serializer):
 
     def load(self, serialized, existing_model=None, session=None):
         """
-        Instancialize a Declarative model from a serialized dict
+        Initialize a Declarative model from a serialized dict
 
         :param dict serialized: the serialized object.
 
         :param None|DeclarativeMeta existing_model: If given, the model will be updated with the serialized data.
 
         :param None|Session session: a SQLAlchemy session. Used only to load nested models
-
-        :rtype: DeclarativeMeta
         """
         from .nested_fields import SessionBasedField
 
@@ -98,14 +94,14 @@ class ModelSerializer(Serializer):
             assert model is not None, "ModelSerializer._create_model cannot return None"
         for field_name, value in serialized.items():
             if field_name not in self._fields:
-                warnings.warn(f"Field '{field_name}' not defined for {self._mapper_class.__name__}")
+                warnings.warn(f"Field '{field_name}' not defined for {self._model_class.__name__}")
                 continue
             field = self._fields[field_name]
             if field.dump_only:
                 continue
             if field.creation_only and existing_model:
                 continue
-            self._assign_default_field_serializer(field, field_name)
+            self._assign_default_serializer(field, field_name)
             if isinstance(field, SessionBasedField):
                 deserialized = field.load(value, session=session)
             else:
@@ -117,7 +113,7 @@ class ModelSerializer(Serializer):
         """
         :rtype: str
         """
-        return self._mapper_class.__name__
+        return self._model_class.__name__
 
     def _create_model(self, serialized):
         """
@@ -129,9 +125,22 @@ class ModelSerializer(Serializer):
         """
         return self.model_class()
 
-    def _assign_default_field_serializer(self, field, property_name):
+    def _initialize_fields(self, nest_foreign_keys):
         """
-        If no serializer is defined, check if the column type has some serialized
+        Collect columns not declared in the serializer
+        """
+        for attribute_name, attribute in self.model_properties.items():
+            if attribute_name.startswith('_'):
+                continue
+            if attribute.foreign_keys and nest_foreign_keys:
+                field_name, nested_field = self._create_nested_field_from_foreign_key(attribute)
+                self._fields.setdefault(field_name, nested_field)
+            else:
+                self._fields.setdefault(attribute_name, Field())
+
+    def _assign_default_serializer(self, field, property_name):
+        """
+        If no serializer is defined, check if the column type has some serializer
         registered in EXTRA_SERIALIZERS.
 
         :param Field field: the field to assign default serializer
@@ -155,3 +164,25 @@ class ModelSerializer(Serializer):
             if isinstance(value, Field):
                 fields[attr_name] = value
         return fields
+
+    def _create_nested_field_from_foreign_key(self, column_object):
+        """
+        Create a NestedModelField for the given `column_object` that represents a foreign key.
+
+        :param Column column_object: the model column object
+
+        :rtype: Tuple[str, NestedModelField]
+        """
+        from serialchemy import NestedModelField
+
+        try:
+            fk_list = list(column_object.foreign_keys)
+        except AttributeError:
+            raise TypeError(f"{column_object} is not a foreign key Column")
+        fk_column = fk_list[0].column
+        for name, rp in self._model_class.__mapper__.relationships.items():
+            if fk_column in rp.remote_side:
+                nested_model_class = rp.argument
+                return name, NestedModelField(nested_model_class)
+        else:
+            raise RuntimeError(f"Unexpected condition for {column_object}")
