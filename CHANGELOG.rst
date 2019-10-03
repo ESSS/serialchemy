@@ -5,6 +5,9 @@ History
 0.3.0 (2019-17-07)
 ------------------
 * Add the composite fields to list of properties of model, to serialize that fields if it type is in EXTRA_SERIALIZERS.
+* Fix error for SQLAlchemy composite attributes
+* Added free functions dump and load so users can quickly dump a SQLAlchemy model without having to instancialize
+  ModelSerializer.
 
 0.2.0 (2019-03-22)
 ------------------
