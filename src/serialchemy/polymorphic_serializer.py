@@ -11,7 +11,11 @@ def _get_identity(cls):
 def _get_identity_key(cls):
     identityColumn = cls.__mapper_args__['polymorphic_on']
     assert isinstance(identityColumn, Column)
-    return identityColumn.key
+    column_db_name = identityColumn.key
+    for attribute_name, attribute in cls.__mapper__.c.items():
+        if attribute.key == column_db_name:
+            return attribute_name
+    raise AttributeError(f"'polymorphic_on' attribute set incorrectly, are you sure it should be {column_db_name}?")
 
 
 def is_sqlalchemy_polymorphic(cls):
