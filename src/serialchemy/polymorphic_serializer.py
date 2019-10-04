@@ -15,7 +15,7 @@ def _get_identity_key(cls):
     for attribute_name, attribute in cls.__mapper__.c.items():
         if attribute.key == column_db_name:
             return attribute_name
-    raise RuntimeError(f"'polymorphic_on' attribute set incorrectly, are you sure it should be {column_db_name}?")
+    raise AttributeError(f"'polymorphic_on' attribute set incorrectly, are you sure it should be {column_db_name}?")
 
 
 def is_sqlalchemy_polymorphic(cls):
