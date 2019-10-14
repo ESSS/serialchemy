@@ -115,7 +115,7 @@ For anything beyond `Generic Types`_ we must extend the `ModelSerializer` class:
 Extend Polymorphic Serializer
 +++++++++++++++++++++++++++++
 One of the possibilities is to serialize SQLalchemy joined table inheritance and
-with it child tables as well. To do such the it's necessary to set a variable with
+it child tables as well. To do such it's necessary to set a variable with
 the desired model class name. Take this `Employee` class with for instance and let us
 assume it have a joined table inheritance: ::
 
