@@ -112,6 +112,43 @@ For anything beyond `Generic Types`_ we must extend the `ModelSerializer` class:
         }
 
 
+Extend Polymorphic Serializer
++++++++++++++++++++++++++++++
+One of the possibilities is to serialize SQLalchemy joined table inheritance and
+it child tables as well. To do such it's necessary to set a variable with
+the desired model class name. Take this `Employee` class with for instance and let us
+assume it have a joined table inheritance: ::
+
+    class Employee(Base):
+        ...
+        type = Column(String(50))
+
+        __mapper_args__ = {
+            'polymorphic_identity':'employee',
+            'polymorphic_on':type
+        }
+
+    class Engineer(Employee):
+        __tablename__ = 'Engineer'
+        id = Column(Integer, ForeignKey('employee.id'), primary_key=True)
+        association = relationship(Association)
+
+        __mapper_args__ = {
+            'polymorphic_identity':'engineer',
+        }
+
+To use a extended `ModelSerializer` class on the `Engineer` class, you should create
+the serializer as it follows: ::
+
+    class EmployeeSerializer(PolymorphicModelSerializer): # Since this class will be polymorphic
+
+        password = Field(load_only=True)
+        company = NestedModelField(Company)
+
+    class EngineerSerializer(EmployeeSerializer):
+         __model_class__ = Engineer # This is the table Serialchemy will refer to
+        association = NestedModelField(Association)
+
 Contributing
 ------------
 
