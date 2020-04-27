@@ -36,7 +36,9 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     package_dir={"": "src"},
     url="http://github.com/ESSS/serialchemy",
-    use_scm_version=True,
+    use_scm_version={
+        "git_describe_command": "git describe --dirty --tags --long --match v*"
+    },
     setup_requires=["setuptools_scm"],
     zip_safe=False,
 )

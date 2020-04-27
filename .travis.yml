@@ -3,7 +3,7 @@ language: python
 stages:
 - test
 - name: deploy
-  if: repo = ESSS/serialchemy AND tag IS present
+  if: repo = ESSS/serialchemy AND tag =~ ^v
 
 install:
 - pip install -U pip
