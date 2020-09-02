@@ -8,7 +8,7 @@ dependencies:
   - pytest
   - pytest-datadir
   - pytest-mock>=1.10
-  - pytest-regressions
+  - pytest-regressions>=1.0.0
 
 environment:
   PYTHONPATH:
