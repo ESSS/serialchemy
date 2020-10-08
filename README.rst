@@ -44,7 +44,9 @@ How to Use it
 Serializing Generic Types
 .........................
 
-Suppose we have an `Employee` SQLAlchemy_ model declared: ::
+Suppose we have an `Employee` SQLAlchemy_ model declared:
+
+.. code-block:: python
 
     class Employee(Base):
         __tablename__ = 'Employee'
@@ -59,7 +61,9 @@ Suppose we have an `Employee` SQLAlchemy_ model declared: ::
         )
         password = Column(String)
 
-`Generic Types`_ are automatically serialized by `ModelSerializer`: ::
+`Generic Types`_ are automatically serialized by `ModelSerializer`:
+
+.. code-block:: python
 
     from serialchemy import ModelSerializer
 
@@ -76,13 +80,17 @@ Suppose we have an `Employee` SQLAlchemy_ model declared: ::
         'password': None
         }
 
-New items can be deserialized by the same serializer: ::
+New items can be deserialized by the same serializer:
+
+.. code-block:: python
 
     new_employee = {'fullname': 'Jobson Gomes', 'admission': '2018-02-03'}
     serializer.load(new_employee)
     >> <Employee object at 0x000001C119DE3940>
 
-Serializers do not commit into the database. You must do this by yourself: ::
+Serializers do not commit into the database. You must do this by yourself:
+
+.. code-block:: python
 
     emp = serializer.load(new_employee)
     session.add(emp)
@@ -93,7 +101,9 @@ Serializers do not commit into the database. You must do this by yourself: ::
 Custom Serializers
 ..................
 
-For anything beyond `Generic Types`_ we must extend the `ModelSerializer` class: ::
+For anything beyond `Generic Types`_ we must extend the `ModelSerializer` class:
+
+.. code-block:: python
 
     class EmployeeSerializer(ModelSerializer):
 
@@ -117,7 +127,9 @@ Extend Polymorphic Serializer
 One of the possibilities is to serialize SQLalchemy joined table inheritance and
 it child tables as well. To do such it's necessary to set a variable with
 the desired model class name. Take this `Employee` class with for instance and let us
-assume it have a joined table inheritance: ::
+assume it have a joined table inheritance:
+
+.. code-block:: python
 
     class Employee(Base):
         ...
@@ -138,7 +150,9 @@ assume it have a joined table inheritance: ::
         }
 
 To use a extended `ModelSerializer` class on the `Engineer` class, you should create
-the serializer as it follows: ::
+the serializer as it follows:
+
+.. code-block:: python
 
     class EmployeeSerializer(PolymorphicModelSerializer): # Since this class will be polymorphic
 
