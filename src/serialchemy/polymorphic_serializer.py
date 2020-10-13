@@ -10,7 +10,7 @@ def _get_identity(cls):
 
 def _get_identity_key(cls):
     identityColumn = cls.__mapper_args__['polymorphic_on']
-    assert isinstance(identityColumn, Column)
+    assert hasattr(identityColumn, 'key')
     column_db_name = identityColumn.key
     for attribute_name, attribute in cls.__mapper__.c.items():
         if attribute.key == column_db_name:
