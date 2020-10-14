@@ -1,8 +1,6 @@
-import datetime
-
 import pytest
 
-from serialchemy._tests.sample_model import Address, Company, Department, Employee, Manager, Engineer
+from serialchemy._tests.sample_model import Address, Company, Department, Employee, Manager, Engineer, SpecialistEngineer
 from serialchemy.field import Field
 from serialchemy.func import dump
 from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
@@ -79,12 +77,13 @@ def seed_data(db_session):
     emp1 = Manager(id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company)
     emp2 = Engineer(id=2, firstname='Sarah', lastname='Kerrigan', role='Engineer', company=company)
     emp3 = Employee(id=3, firstname='Tychus', lastname='Findlay')
+    emp4 = SpecialistEngineer(id=4, firstname='Doran', lastname='Routhe', specialization='Mechanical')
 
     addr1 = Address(street="5 Av", number="943", city="Tarsonis")
     emp1.address = addr1
     emp2.address = addr1
 
-    db_session.add_all([company, emp1, emp2, emp3])
+    db_session.add_all([company, emp1, emp2, emp3, emp4])
     db_session.commit()
 
 
@@ -221,6 +220,25 @@ def test_inherited_model_serialization(db_session):
     assert serialized.get('role') == 'Engineer'
     model = serializer.load(serialized, session=db_session)
     assert hasattr(model, 'engineer_name')
+
+
+def test_nested_inherited_model_serialization(db_session):
+
+    serializer = PolymorphicModelSerializer(Engineer)
+
+    engineer = db_session.query(Employee).get(2)
+    assert isinstance(engineer, Engineer)
+    serialized = serializer.dump(engineer)
+    assert serialized.get('role') == 'Engineer'
+    assert 'specialization' not in serialized.keys()
+
+
+    specialist_engineer = db_session.query(Employee).get(4)
+    assert isinstance(specialist_engineer, SpecialistEngineer)
+    serialized = serializer.dump(specialist_engineer)
+    assert serialized.get('role') == 'Specialist Engineer'
+    assert 'specialization' in serialized.keys()
+    assert serialized.get('specialization') == 'Mechanical'
 
 
 def test_creation_only_flag(db_session):
