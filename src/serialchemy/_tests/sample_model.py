@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select, Float, Date
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import column_property, object_session, relationship
+from sqlalchemy.orm import object_session, relationship
 
 from serialchemy.model_serializer import ModelSerializer
 from serialchemy.field import Field
@@ -113,8 +113,19 @@ class Engineer(Employee):
 
     __mapper_args__ = {
         'polymorphic_identity':'Engineer',
+        'polymorphic_on': Employee.role
     }
 
+class SpecialistEngineer(Engineer):
+
+    __tablename__ = 'SpecialistEngineer'
+
+    id = Column(Integer, ForeignKey('Engineer.id'), primary_key=True)
+    specialization = Column(String(30))
+
+    __mapper_args__ = {
+        'polymorphic_identity':'Specialist Engineer',
+    }
 
 class Manager(Employee):
 
