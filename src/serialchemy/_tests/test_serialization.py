@@ -1,28 +1,12 @@
 import pytest
 
-from serialchemy._tests.sample_model import Address, Company, Department, Employee, Manager, Engineer, SpecialistEngineer
+from serialchemy._tests.sample_model import Address, Company, Department, Employee, Manager, \
+    Engineer, SpecialistEngineer, ContractType
 from serialchemy.field import Field
 from serialchemy.func import dump
 from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
 from serialchemy.model_serializer import ModelSerializer
 from serialchemy.polymorphic_serializer import PolymorphicModelSerializer
-
-
-class EmployeeSerializerNestedModelFields(ModelSerializer):
-
-    password = Field(load_only=True)
-    created_at = Field(dump_only=True)
-    address = NestedModelField(Address)
-    company = NestedModelField(Company)
-
-
-class EmployeeSerializerNestedAttrsFields(ModelSerializer):
-
-    password = Field(load_only=True)
-    created_at = Field(dump_only=True)
-    address = NestedAttributesField(('id', 'street', 'number', 'city'))
-    company = NestedAttributesField(('name', 'location'))
-    department = NestedAttributesField(('name',))
 
 
 class EmployeeSerializerPrimaryKeyFields(ModelSerializer):
@@ -31,7 +15,7 @@ class EmployeeSerializerPrimaryKeyFields(ModelSerializer):
     created_at = Field(dump_only=True)
     address = PrimaryKeyField(Address)
     company = PrimaryKeyField(Company)
-    department = PrimaryKeyField(Department)
+    departments = PrimaryKeyField(Department)
 
 
 class EmployeeSerializerMixedFields(ModelSerializer):
@@ -46,11 +30,6 @@ class EmployeeSerializerMixedFields(ModelSerializer):
 class EmployeeSerializerHybridProperty(ModelSerializer):
 
     full_name = Field(dump_only=True)
-
-
-class EmployeeSerializerProtectedField(ModelSerializer):
-
-    _role = Field()
 
 
 class EmployeeInheritedModelSerializer(PolymorphicModelSerializer):
@@ -76,7 +55,7 @@ def seed_data(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
     emp1 = Manager(id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company)
     emp2 = Engineer(id=2, firstname='Sarah', lastname='Kerrigan', role='Engineer', company=company)
-    emp3 = Employee(id=3, firstname='Tychus', lastname='Findlay')
+    emp3 = Employee(id=3, firstname='Tychus', lastname='Findlay', contract_type=ContractType.CONTRACTOR)
     emp4 = SpecialistEngineer(id=4, firstname='Doran', lastname='Routhe', specialization='Mechanical')
 
     addr1 = Address(street="5 Av", number="943", city="Tarsonis")
@@ -106,55 +85,6 @@ def test_model_load(data_regression):
     data_regression.Check(dump(model))
 
 
-@pytest.mark.parametrize("serializer_class",
-    [EmployeeSerializerNestedModelFields, EmployeeSerializerNestedAttrsFields]
-)
-def test_custom_serializer(serializer_class, db_session, data_regression):
-    emp = db_session.query(Employee).get(1)
-    serializer = serializer_class(Employee)
-    serialized = serializer.dump(emp)
-    data_regression.check(serialized, basename="test_custom_serializer_{}".format(serializer_class.__name__))
-
-
-def test_deserialize_with_custom_serializer(db_session, data_regression):
-    serializer = EmployeeSerializerNestedModelFields(Employee)
-    serialized = {
-        "firstname": "John",
-        "lastname": "Doe",
-        "company_id": 5,
-        "admission": "2004-06-01T00:00:00",
-        "address": {
-            "number": "245",
-            "street": "6 Av",
-            "zip": "88088-000"
-        },
-        # Dump only field, must be ignored
-        "created_at": "2023-12-21T00:00:00",
-    }
-    loaded_emp = serializer.load(serialized, session=db_session)
-    data_regression.check(serializer.dump(loaded_emp))
-
-
-def test_deserialize_existing_model(db_session):
-    original = db_session.query(Employee).get(1)
-    assert original.firstname == "Jim"
-    assert original.address.zip is None
-
-    serializer = EmployeeSerializerNestedModelFields(Employee)
-    serialized = {
-        "id": 1,
-        "firstname": "James Eugene",
-        "address": {
-            "zip": "88088-000"
-        },
-    }
-
-    loaded_emp = serializer.load(serialized, session=db_session)
-    assert serialized["id"] == loaded_emp.id
-    assert serialized["firstname"] == loaded_emp.firstname
-    assert serialized["address"]["zip"] == loaded_emp.address.zip
-
-
 def test_one2one_pk_field(db_session, data_regression):
     serializer = EmployeeSerializerPrimaryKeyFields(Employee)
     employee = db_session.query(Employee).get(2)
@@ -174,13 +104,6 @@ def test_one2many_pk_field(db_session, data_regression):
     assert company.employees[1] == db_session.query(Employee).get(3)
 
 
-def test_empty_nested(db_session):
-    serializer = EmployeeSerializerNestedModelFields(Employee)
-    serialized = serializer.dump(db_session.query(Employee).get(3))
-    assert serialized['company'] is None
-    model = serializer.load(serialized, session=db_session)
-    assert model.company is None
-
 def test_property_serialization(db_session):
     serializer = EmployeeSerializerHybridProperty(Employee)
     serialized = serializer.dump(db_session.query(Employee).get(2))
@@ -188,8 +111,7 @@ def test_property_serialization(db_session):
 
 
 def test_protected_field_default_creation(db_session):
-
-    serializer = EmployeeSerializerProtectedField(Employee)
+    serializer = ModelSerializer(Employee)
     employee = db_session.query(Employee).get(1)
     assert employee._salary == 400
     serialized = serializer.dump(employee)
@@ -242,7 +164,6 @@ def test_nested_inherited_model_serialization(db_session):
 
 
 def test_creation_only_flag(db_session):
-
     serializer = EmployeeSerializerCreationOnlyField(Employee)
 
     serialized = {
@@ -269,3 +190,25 @@ def test_creation_only_flag(db_session):
 
     assert changed_employee.email == 'spoc@cap.co'
     assert employee.firstname == 'Other Spock'
+
+
+def test_dump_choice_type(db_session, data_regression):
+    tychus: Employee = db_session.query(Employee).get(3)
+    serializer = ModelSerializer(Employee)
+    dump = serializer.dump(tychus)
+    data_regression.check(dump)
+
+def test_load_choice_type(db_session):
+    json = {
+        "password": "some",
+        "email": "other_spoc@cap.co",
+        "firstname": "Other Spock",
+        "contract_type": "Other"
+    }
+
+    serializer = ModelSerializer(Employee)
+    loaded = serializer.load(json)
+    db_session.add(loaded)
+    db_session.commit()
+
+    assert loaded.contract_type == ContractType.OTHER

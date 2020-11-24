@@ -1,9 +1,11 @@
 from datetime import datetime
+from enum import Enum
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select, Float, Date
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import object_session, relationship
+from sqlalchemy_utils import ChoiceType
 
 from serialchemy.model_serializer import ModelSerializer
 from serialchemy.field import Field
@@ -62,6 +64,12 @@ class Contact(Base):
     employee_id = Column(ForeignKey('Employee.id'))
 
 
+class ContractType(Enum):
+
+    EMPLOYEE = 'Employee'
+    CONTRACTOR = 'Contractor'
+    OTHER = 'Other'
+
 class Employee(Base):
 
     __tablename__ = 'Employee'
@@ -80,6 +88,7 @@ class Employee(Base):
     contacts = relationship(Contact, cascade='all, delete-orphan')
     role = Column(String)
     _salary = Column(Float)
+    contract_type = Column(ChoiceType(ContractType))
 
     password = Column(String)
     created_at = Column(DateTime, default=datetime(2000, 1, 2))

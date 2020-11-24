@@ -9,6 +9,7 @@ address_id: null
 admission: '2004-06-01'
 company: null
 company_id: 5
+contract_type: null
 created_at: null
 email: null
 firstname: John
