@@ -66,7 +66,11 @@ class ModelSerializer(Serializer):
         for attr, field in self._fields.items():
             if field.load_only:
                 continue
-            value = getattr(model, attr, None)
+            if not hasattr(model, attr):
+                warnings.warn(f"{model.__class__} does not have attribute '{attr}'")
+                value = None
+            else:
+                value = getattr(model, attr)
             if field:
                 self._assign_default_serializer(field, attr)
                 serialized = field.dump(value)

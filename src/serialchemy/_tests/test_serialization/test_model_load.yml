@@ -1,6 +1,7 @@
 address_id: null
 admission: '2152-01-02'
 company_id: null
+contract_type: null
 created_at: null
 email: sarahk@blitz.com
 firstname: Sarah

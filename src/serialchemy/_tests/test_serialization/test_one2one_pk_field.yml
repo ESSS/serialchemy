@@ -3,8 +3,9 @@ address_id: 1
 admission: '2000-01-01'
 company: 5
 company_id: 5
+contract_type: null
 created_at: '2000-01-02T00:00:00'
-department: null
+departments: []
 email: null
 firstname: Sarah
 id: 2

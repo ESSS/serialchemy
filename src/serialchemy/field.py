@@ -1,3 +1,5 @@
+from enum import Enum
+
 from serialchemy.serializer import Serializer
 
 class Field(object):
@@ -33,6 +35,10 @@ class Field(object):
     def dump(self, value):
         if value is not None and self.serializer:
             return self.serializer.dump(value)
+        elif isinstance(value, Enum):
+            # We consider Enum a "basic type", so we check for Enums and to convert them to a json
+            # serializable value to avoid requiring a special "serializer" for it.
+            return value.value
         else:
             return value
 

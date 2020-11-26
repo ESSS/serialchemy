@@ -11,16 +11,24 @@ with io.open("CHANGELOG.rst", encoding="UTF-8") as changelog_file:
 requirements = ["sqlalchemy>=1.1"]
 extras_require = {
     "docs": ["sphinx >= 1.4", "sphinx_rtd_theme", "sphinx-autodoc-typehints"],
-    "testing": ["codecov", "pytest", "pytest-cov", "pytest-regressions", "pre-commit", "tox"],
+    "testing": [
+        "codecov",
+        "pytest",
+        "pytest-cov",
+        "pytest-regressions",
+        "pre-commit",
+        "tox",
+        "sqlalchemy_utils",
+    ],
 }
 setuptools.setup(
     name="serialchemy",
     description="Serializers for SQLAlchemy models.",
-    author='ESSS',
-    author_email='foss@esss.co',
-    version='0.1.0',
+    author="ESSS",
+    author_email="foss@esss.co",
+    version="0.1.0",
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.6",
