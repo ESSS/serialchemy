@@ -143,6 +143,14 @@ def test_inherited_model_serialization(db_session):
     model = serializer.load(serialized, session=db_session)
     assert hasattr(model, 'engineer_name')
 
+    engineer = db_session.query(Employee).get(4)
+    assert isinstance(engineer, SpecialistEngineer)
+
+    serialized = serializer.dump(engineer)
+    assert serialized.get('role') == 'Specialist Engineer'
+    model = serializer.load(serialized, session=db_session)
+    assert hasattr(model, 'specialization')
+
 
 def test_nested_inherited_model_serialization(db_session):
 

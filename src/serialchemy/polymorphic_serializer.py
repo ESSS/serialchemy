@@ -45,9 +45,15 @@ class PolymorphicModelSerializer(ModelSerializer):
             sub_cls.get_identity(): sub_cls for sub_cls in cls.__subclasses__() if sub_cls.get_identity()
         }
 
+        def get_subclasses(declarative_class):
+            subclasses = declarative_class.__subclasses__()
+            for s in subclasses:
+                subclasses.extend(get_subclasses(s))
+            return subclasses
+
         return {
             _get_identity(sub_cls): serializers_sub_class_map.get(_get_identity(sub_cls), cls)(sub_cls)
-            for sub_cls in declarative_class.__subclasses__()
+            for sub_cls in get_subclasses(declarative_class)
         }
 
     @classmethod
