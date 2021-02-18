@@ -46,6 +46,7 @@ class PolymorphicModelSerializer(ModelSerializer):
         }
 
         def get_subclasses(declarative_class):
+            """Recursively finds all subclasses of the current class"""
             subclasses = declarative_class.__subclasses__()
             for s in subclasses:
                 subclasses.extend(get_subclasses(s))
