@@ -20,13 +20,38 @@ class PrimaryKeyField(SessionBasedField):
     """
     Convert relationships in a list of primary keys (for serialization and deserialization).
     """
+
     def __init__(self, model_class, **kwargs):
         super().__init__(**kwargs)
-        if self._serializer is None:
-            self._serializer = PrimaryKeySerializer(model_class)
+        self.model_class = model_class
+        self._pk_column = get_model_pk_column(self.model_class)
 
     def load(self, serialized, session):
-        return self.serializer.load(serialized, session)
+        pk_column = self._pk_column
+        query_results = session \
+            .query(self.model_class) \
+            .filter(pk_column.in_(serialized)) \
+            .all()
+        if len(serialized) != len(query_results):
+            warn("Not all primary keys found for '{}.{}'".format(
+                self.model_class.__name__, self._pk_column
+            ))
+        return query_results
+
+    def dump(self, value):
+
+        def is_tomany_attribute(column):
+            """
+            Check if the Declarative relationship attribute represents a to-many relationship.
+            """
+            return isinstance(column, (list, AppenderMixin))
+
+        pk_column = self._pk_column
+        if is_tomany_attribute(value):
+            serialized = [getattr(item, pk_column.key) for item in value]
+        else:
+            return getattr(value, pk_column.key)
+        return serialized
 
 
 class NestedModelField(SessionBasedField):
@@ -35,9 +60,9 @@ class NestedModelField(SessionBasedField):
     """
 
     def __init__(self, model_class, **kwargs):
+        if kwargs.get('serializer') is None:
+            kwargs['serializer'] = ModelSerializer(model_class)
         super().__init__(**kwargs)
-        if self._serializer is None:
-            self._serializer = ModelSerializer(model_class)
 
     def load(self, serialized, session):
         if not serialized:
@@ -63,9 +88,9 @@ class NestedModelListField(SessionBasedField):
     """
 
     def __init__(self, model_class, **kwargs):
+        if kwargs.get('serializer') is None:
+            kwargs['serializer'] = ModelSerializer(model_class)
         super().__init__(**kwargs)
-        if self._serializer is None:
-            self._serializer = ModelSerializer(model_class)
 
     def load(self, serialized, session):
         if not serialized:
@@ -106,41 +131,6 @@ class NestedAttributesField(Field):
         """
         serializer = NestedAttributesSerializer(attributes, many)
         super().__init__(dump_only=True, serializer=serializer)
-
-
-class PrimaryKeySerializer(SessionBasedField):
-
-    def __init__(self, model_class, **kwargs):
-        super().__init__(**kwargs)
-        self.model_class = model_class
-        self._pk_column = get_model_pk_column(self.model_class)
-
-    def load(self, serialized, session):
-        pk_column = self._pk_column
-        query_results = session\
-            .query(self.model_class)\
-            .filter(pk_column.in_(serialized))\
-            .all()
-        if len(serialized) != len(query_results):
-            warn("Not all primary keys found for '{}.{}'".format(
-                self.model_class.__name__, self._pk_column
-            ))
-        return query_results
-
-    def dump(self, value):
-
-        def is_tomany_attribute(column):
-            """
-            Check if the Declarative relationship attribute represents a to-many relationship.
-            """
-            return isinstance(column, (list, AppenderMixin))
-
-        pk_column = self._pk_column
-        if is_tomany_attribute(value):
-            serialized = [getattr(item, pk_column.key) for item in value]
-        else:
-            return getattr(value, pk_column.key)
-        return serialized
 
 
 class NestedAttributesSerializer(Serializer):

@@ -6,7 +6,7 @@ from serialchemy.enum_serializer import EnumSerializer
 from serialchemy.serializer_checks import is_datetime_column, is_enum_column, is_date_column
 
 from .datetime_serializer import DateTimeColumnSerializer, DateColumnSerializer
-from .field import Field
+from .field import Field, DefaultFieldSerializer
 from .serializer import Serializer
 
 
@@ -152,7 +152,7 @@ class ModelSerializer(Serializer):
         :param str property_name: sqlalchemy column name on model
         """
         model_property = self.model_properties.get(property_name)
-        if field.serializer is None and model_property is not None:
+        if isinstance(field.serializer, DefaultFieldSerializer) and model_property is not None:
             for serializer_class, serializer_check in self.EXTRA_SERIALIZERS:
                 if serializer_check(model_property):
                     field._serializer = serializer_class(model_property)
