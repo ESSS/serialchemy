@@ -60,7 +60,7 @@ def test_deserialize_with_custom_serializer(db_session, data_regression):
         "lastname": "Doe",
         "company_id": 5,
         "admission": "2004-06-01T00:00:00",
-        "address": {"number": "245", "street": "6 Av", "zip": "88088-000"},
+        "address": {"id": 1, "number": "245", "street": "6 Av", "zip": "88088-000"},
         # Dump only field, must be ignored
         "created_at": "2023-12-21T00:00:00",
     }
