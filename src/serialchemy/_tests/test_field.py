@@ -2,7 +2,6 @@ from serialchemy import Field, Serializer
 
 
 class CustomSerializer(Serializer):
-
     def dump(self, value):
         return f'dumped {value}'
 

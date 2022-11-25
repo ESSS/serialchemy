@@ -15,7 +15,9 @@ def _get_identity_key(cls):
     for attribute_name, attribute in cls.__mapper__.c.items():
         if attribute.key == column_db_name:
             return attribute_name
-    raise AttributeError(f"'polymorphic_on' attribute set incorrectly, are you sure it should be {column_db_name}?")
+    raise AttributeError(
+        f"'polymorphic_on' attribute set incorrectly, are you sure it should be {column_db_name}?"
+    )
 
 
 def is_sqlalchemy_polymorphic(cls):
@@ -42,7 +44,9 @@ class PolymorphicModelSerializer(ModelSerializer):
     def _get_sub_serializers(cls, declarative_class):
 
         serializers_sub_class_map = {
-            sub_cls.get_identity(): sub_cls for sub_cls in cls.__subclasses__() if sub_cls.get_identity()
+            sub_cls.get_identity(): sub_cls
+            for sub_cls in cls.__subclasses__()
+            if sub_cls.get_identity()
         }
 
         def get_subclasses(declarative_class):
@@ -53,7 +57,9 @@ class PolymorphicModelSerializer(ModelSerializer):
             return subclasses
 
         return {
-            _get_identity(sub_cls): serializers_sub_class_map.get(_get_identity(sub_cls), cls)(sub_cls)
+            _get_identity(sub_cls): serializers_sub_class_map.get(_get_identity(sub_cls), cls)(
+                sub_cls
+            )
             for sub_cls in get_subclasses(declarative_class)
         }
 
@@ -65,7 +71,9 @@ class PolymorphicModelSerializer(ModelSerializer):
         if self.is_polymorphic:
             model_identity = serialized.get(self.identity_key)
             if model_identity and self.sub_serializers.get(model_identity):
-                return self.sub_serializers[model_identity].load(serialized, existing_model, session)
+                return self.sub_serializers[model_identity].load(
+                    serialized, existing_model, session
+                )
         return super().load(serialized, existing_model, session)
 
     def dump(self, model):

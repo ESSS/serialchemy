@@ -1,8 +1,14 @@
 import pytest
 
 from serialchemy import ModelSerializer
-from serialchemy._tests.sample_model import Address, Company, Employee, Manager, Engineer, \
-    SpecialistEngineer
+from serialchemy._tests.sample_model import (
+    Address,
+    Company,
+    Employee,
+    Manager,
+    Engineer,
+    SpecialistEngineer,
+)
 from serialchemy.field import Field
 from serialchemy.nested_fields import NestedAttributesField, NestedModelField
 
@@ -26,10 +32,14 @@ class EmployeeSerializerNestedAttrsFields(ModelSerializer):
 @pytest.fixture(autouse=True)
 def setup(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
-    emp1 = Manager(id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company)
+    emp1 = Manager(
+        id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company
+    )
     emp2 = Engineer(id=2, firstname='Sarah', lastname='Kerrigan', role='Engineer', company=company)
     emp3 = Employee(id=3, firstname='Tychus', lastname='Findlay')
-    emp4 = SpecialistEngineer(id=4, firstname='Doran', lastname='Routhe', specialization='Mechanical')
+    emp4 = SpecialistEngineer(
+        id=4, firstname='Doran', lastname='Routhe', specialization='Mechanical'
+    )
 
     addr1 = Address(street="5 Av", number="943", city="Tarsonis")
     emp1.address = addr1

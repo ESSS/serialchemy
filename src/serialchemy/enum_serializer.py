@@ -2,7 +2,6 @@ from .serializer import ColumnSerializer
 
 
 class EnumSerializer(ColumnSerializer):
-
     def dump(self, value):
         if not value:
             return None

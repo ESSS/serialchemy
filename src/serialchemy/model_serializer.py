@@ -18,7 +18,7 @@ class ModelSerializer(Serializer):
     EXTRA_SERIALIZERS = [
         (DateTimeColumnSerializer, is_datetime_column),
         (DateColumnSerializer, is_date_column),
-        (EnumSerializer, is_enum_column)
+        (EnumSerializer, is_enum_column),
     ]
 
     def __init__(self, model_class, nest_foreign_keys=False):

@@ -1,7 +1,15 @@
 import pytest
 
-from serialchemy._tests.sample_model import Address, Company, Department, Employee, Manager, \
-    Engineer, SpecialistEngineer, ContractType
+from serialchemy._tests.sample_model import (
+    Address,
+    Company,
+    Department,
+    Employee,
+    Manager,
+    Engineer,
+    SpecialistEngineer,
+    ContractType,
+)
 from serialchemy.field import Field
 from serialchemy.func import dump
 from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
@@ -53,10 +61,16 @@ class EmployeeSerializerCreationOnlyField(ModelSerializer):
 @pytest.fixture(autouse=True)
 def seed_data(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
-    emp1 = Manager(id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company)
+    emp1 = Manager(
+        id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company
+    )
     emp2 = Engineer(id=2, firstname='Sarah', lastname='Kerrigan', role='Engineer', company=company)
-    emp3 = Employee(id=3, firstname='Tychus', lastname='Findlay', contract_type=ContractType.CONTRACTOR)
-    emp4 = SpecialistEngineer(id=4, firstname='Doran', lastname='Routhe', specialization='Mechanical')
+    emp3 = Employee(
+        id=3, firstname='Tychus', lastname='Findlay', contract_type=ContractType.CONTRACTOR
+    )
+    emp4 = SpecialistEngineer(
+        id=4, firstname='Doran', lastname='Routhe', specialization='Mechanical'
+    )
 
     addr1 = Address(street="5 Av", number="943", city="Tarsonis")
     emp1.address = addr1
@@ -79,7 +93,7 @@ def test_model_load(data_regression):
         "firstname": "Sarah",
         "lastname": "Kerrigan",
         "email": "sarahk@blitz.com",
-        "admission": "2152-01-02T00:00:00"
+        "admission": "2152-01-02T00:00:00",
     }
     model = serializer.load(employee_dict)
     data_regression.Check(dump(model))
@@ -162,7 +176,6 @@ def test_nested_inherited_model_serialization(db_session):
     assert serialized.get('role') == 'Engineer'
     assert 'specialization' not in serialized.keys()
 
-
     specialist_engineer = db_session.query(Employee).get(4)
     assert isinstance(specialist_engineer, SpecialistEngineer)
     serialized = serializer.dump(specialist_engineer)
@@ -174,11 +187,7 @@ def test_nested_inherited_model_serialization(db_session):
 def test_creation_only_flag(db_session):
     serializer = EmployeeSerializerCreationOnlyField(Employee)
 
-    serialized = {
-        "password": "some",
-        "email": "spoc@cap.co",
-        "firstname": "Spock"
-    }
+    serialized = {"password": "some", "email": "spoc@cap.co", "firstname": "Spock"}
 
     employee: Employee = serializer.load(serialized)
     db_session.add(employee)
@@ -188,11 +197,7 @@ def test_creation_only_flag(db_session):
     assert employee.email == 'spoc@cap.co'
     assert employee.firstname == 'Spock'
 
-    serialized = {
-        "password": "some",
-        "email": "other_spoc@cap.co",
-        "firstname": "Other Spock"
-    }
+    serialized = {"password": "some", "email": "other_spoc@cap.co", "firstname": "Other Spock"}
 
     changed_employee: Employee = serializer.load(serialized, existing_model=employee)
 
@@ -206,12 +211,13 @@ def test_dump_choice_type(db_session, data_regression):
     dump = serializer.dump(tychus)
     data_regression.check(dump)
 
+
 def test_load_choice_type(db_session):
     json = {
         "password": "some",
         "email": "other_spoc@cap.co",
         "firstname": "Other Spock",
-        "contract_type": "Other"
+        "contract_type": "Other",
     }
 
     serializer = ModelSerializer(Employee)

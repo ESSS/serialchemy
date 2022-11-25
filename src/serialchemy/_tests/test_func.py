@@ -19,13 +19,7 @@ def test_dump(db_session, data_regression):
 
 
 def test_load(db_session):
-    data = dict(
-        firstname='Sarah',
-        lastname='Kerrigan',
-        company=dict(
-            name='Terrans'
-        )
-    )
+    data = dict(firstname='Sarah', lastname='Kerrigan', company=dict(name='Terrans'))
     employee = func.load(data, Employee, nest_foreign_keys=True)
     assert employee.role == "Employee"
     assert employee.firstname == "Sarah"
