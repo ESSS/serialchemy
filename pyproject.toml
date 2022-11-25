@@ -1,0 +1,14 @@
+[build-system]
+requires = [
+  "setuptools>=45",
+  "setuptools_scm[toml]>=6.2",
+  "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+git_describe_command = "git describe --dirty --tags --long --exclude RFDAP*"
+
+[tool.black]
+line-length = 100
+skip-string-normalization = true

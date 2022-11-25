@@ -28,18 +28,16 @@ class PrimaryKeyField(SessionBasedField):
 
     def load(self, serialized, session):
         pk_column = self._pk_column
-        query_results = session \
-            .query(self.model_class) \
-            .filter(pk_column.in_(serialized)) \
-            .all()
+        query_results = session.query(self.model_class).filter(pk_column.in_(serialized)).all()
         if len(serialized) != len(query_results):
-            warn("Not all primary keys found for '{}.{}'".format(
-                self.model_class.__name__, self._pk_column
-            ))
+            warn(
+                "Not all primary keys found for '{}.{}'".format(
+                    self.model_class.__name__, self._pk_column
+                )
+            )
         return query_results
 
     def dump(self, value):
-
         def is_tomany_attribute(column):
             """
             Check if the Declarative relationship attribute represents a to-many relationship.
@@ -135,7 +133,6 @@ class NestedAttributesField(Field):
 
 
 class NestedAttributesSerializer(Serializer):
-
     def __init__(self, attributes, many):
         self.attributes = attributes
         self.many = many
@@ -165,7 +162,9 @@ def get_model_pk_attr_name(model_class):
 
     :return: str: a Column name
     """
-    primary_key_columns = list(filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items()))
+    primary_key_columns = list(
+        filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
+    )
     if len(primary_key_columns) == 1:
         return primary_key_columns.pop()[0]
     elif len(primary_key_columns) < 1:

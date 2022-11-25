@@ -70,6 +70,7 @@ class ContractType(Enum):
     CONTRACTOR = 'Contractor'
     OTHER = 'Other'
 
+
 class Employee(Base):
 
     __tablename__ = 'Employee'
@@ -93,10 +94,7 @@ class Employee(Base):
     password = Column(String)
     created_at = Column(DateTime, default=datetime(2000, 1, 2))
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'Employee',
-        'polymorphic_on': role
-    }
+    __mapper_args__ = {'polymorphic_identity': 'Employee', 'polymorphic_on': role}
 
     @property
     def colleagues(self):
@@ -107,9 +105,11 @@ class Employee(Base):
         return " ".join([self.firstname, self.lastname])
 
 
-employee_department = Table('employee_department', Base.metadata,
+employee_department = Table(
+    'employee_department',
+    Base.metadata,
     Column('employee_id', Integer, ForeignKey('Employee.id')),
-    Column('department_id', Integer, ForeignKey('Department.id'))
+    Column('department_id', Integer, ForeignKey('Department.id')),
 )
 
 
@@ -120,10 +120,8 @@ class Engineer(Employee):
     id = Column(Integer, ForeignKey('Employee.id'), primary_key=True)
     engineer_name = Column(String(30))
 
-    __mapper_args__ = {
-        'polymorphic_identity':'Engineer',
-        'polymorphic_on': Employee.role
-    }
+    __mapper_args__ = {'polymorphic_identity': 'Engineer', 'polymorphic_on': Employee.role}
+
 
 class SpecialistEngineer(Engineer):
 
@@ -133,8 +131,9 @@ class SpecialistEngineer(Engineer):
     specialization = Column(String(30))
 
     __mapper_args__ = {
-        'polymorphic_identity':'Specialist Engineer',
+        'polymorphic_identity': 'Specialist Engineer',
     }
+
 
 class Manager(Employee):
 
@@ -144,7 +143,7 @@ class Manager(Employee):
     manager_name = Column(String(30))
 
     __mapper_args__ = {
-        'polymorphic_identity':'Manager',
+        'polymorphic_identity': 'Manager',
     }
 
 

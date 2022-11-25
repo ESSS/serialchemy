@@ -2,25 +2,28 @@
 Serialchemy
 ======================================================================
 
-.. TODO: Publish to PyPi
-    .. image:: https://img.shields.io/pypi/v/serialchemy.svg
+
+.. image:: https://img.shields.io/pypi/v/serialchemy.svg
     :target: https://pypi.python.org/pypi/serialchemy
-    .. image:: https://img.shields.io/pypi/pyversions/serialchemy.svg
+
+.. image:: https://img.shields.io/pypi/pyversions/serialchemy.svg
     :target: https://pypi.org/project/serialchemy
 
-.. image:: https://img.shields.io/travis/ESSS/serialchemy.svg
-    :target: https://travis-ci.org/ESSS/serialchemy
-
-.. image:: https://ci.appveyor.com/api/projects/status/github/ESSS/serialchemy?branch=master
-    :target: https://ci.appveyor.com/project/ESSS/serialchemy/?branch=master&svg=true
+.. image:: https://github.com/ESSS/serialchemy/workflows/build/badge.svg
+    :target: https://github.com/ESSS/serialchemy/actions
 
 .. image:: https://codecov.io/gh/ESSS/serialchemy/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/ESSS/serialchemy
 
-.. image:: https://img.shields.io/readthedocs/pip.svg
+.. image:: https://img.shields.io/readthedocs/serialchemy.svg
     :target: https://serialchemy.readthedocs.io/en/latest/
 
+.. image:: https://sonarcloud.io/api/project_badges/measure?project=ESSS_serialchemy&metric=alert_status
+    :target: https://sonarcloud.io/project/overview?id=ESSS_serialchemy
+
+
 SQLAlchemy model serialization.
+===============
 
 Motivation
 ----------

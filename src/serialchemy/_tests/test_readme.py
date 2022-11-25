@@ -6,11 +6,13 @@ from sqlalchemy.orm import column_property, relationship
 
 Base = declarative_base()
 
+
 class Company(Base):
     __tablename__ = 'Company'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+
 
 class Employee(Base):
     __tablename__ = 'Employee'
@@ -20,9 +22,7 @@ class Employee(Base):
     admission = Column(DateTime, default=datetime(2000, 1, 1))
     company_id = Column(ForeignKey('Company.id'))
     company = relationship(Company)
-    company_name = column_property(
-        select([Company.name]).where(Company.id == company_id)
-    )
+    company_name = column_property(select([Company.name]).where(Company.id == company_id))
     password = Column(String)
 
 

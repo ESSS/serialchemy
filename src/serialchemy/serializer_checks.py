@@ -10,6 +10,7 @@ def is_datetime_column(col):
     :rtype: bool
     """
     from sqlalchemy import DateTime
+
     if not isinstance(col, Column):
         return False
 
@@ -24,6 +25,7 @@ def is_date_column(col):
         return False
 
     from sqlalchemy import Date
+
     return type(col.type) is Date
 
 
