@@ -162,12 +162,11 @@ def get_model_pk_attr_name(model_class):
 
     :return: str: a Column name
     """
-    primary_key_columns = list(
-        filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
-    )
-    if len(primary_key_columns) == 1:
-        return primary_key_columns.pop()[0]
-    elif len(primary_key_columns) < 1:
+    from sqlalchemy.inspection import inspect
+    primary_key_names = [pk for pk in inspect(model_class)._primary_key_propkeys]
+    if len(primary_key_names) == 1:
+        return primary_key_names[0]
+    elif len(primary_key_names) < 1:
         raise RuntimeError(f"Couldn't find attribute for {model_class}")
     else:
         raise RuntimeError("Multiple primary keys still not supported")
