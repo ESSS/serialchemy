@@ -164,7 +164,7 @@ def get_model_pk_attr_name(model_class):
     import sys
 
     # TODO EDEN-2586: Investigate SqlAlchemy inspect failing on Python 3.6
-    if sys.version.startswith('3.6'):
+    if sys.version_info[:2] == (3, 6):
         primary_key_columns = list(
             filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
         )
