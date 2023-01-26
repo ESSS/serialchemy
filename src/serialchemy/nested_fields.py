@@ -1,10 +1,9 @@
+from sqlalchemy.orm.dynamic import AppenderMixin
 from warnings import warn
 
-from sqlalchemy.orm.dynamic import AppenderMixin
-
 from .field import Field
-from .serializer import Serializer
 from .model_serializer import ModelSerializer
+from .serializer import Serializer
 
 
 class SessionBasedField(Field):
@@ -162,8 +161,19 @@ def get_model_pk_attr_name(model_class):
 
     :return: str: a Column name
     """
-    from sqlalchemy.inspection import inspect
-    primary_key_names = [pk for pk in inspect(model_class)._primary_key_propkeys]
+    import sys
+
+    # TODO EDEN-2586: Investigate SqlAlchemy inspect failing on Python 3.6
+    if sys.version.startswith('3.6'):
+        primary_key_columns = list(
+            filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
+        )
+        primary_key_names = [column[1].name for column in primary_key_columns]
+    else:
+        from sqlalchemy.inspection import inspect
+
+        primary_key_names = [pk for pk in inspect(model_class)._primary_key_propkeys]
+
     if len(primary_key_names) == 1:
         return primary_key_names[0]
     elif len(primary_key_names) < 1:
