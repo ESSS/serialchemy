@@ -167,7 +167,7 @@ def get_model_pk_attr_name(model_class):
         primary_key_columns = list(
             filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
         )
-        primary_key_names = [pk[0] for pk in primary_key_columns]
+        primary_key_names = [pk[1].name for pk in primary_key_columns]
     else:
         from sqlalchemy.inspection import inspect
 
