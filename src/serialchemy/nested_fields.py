@@ -152,14 +152,13 @@ class NestedAttributesSerializer(Serializer):
     def load(self, serialized, session=None):
         raise NotImplementedError()
 
-
 def get_model_pk_attr_name(model_class):
     """
     Get the primary key attribute name from a Declarative model class
 
     :param Type[DeclarativeMeta] model_class: a Declarative class
 
-    :return: str: a Column name
+    :return: str: the attribute name for the column with primary key
     """
     import sys
 
@@ -168,7 +167,7 @@ def get_model_pk_attr_name(model_class):
         primary_key_columns = list(
             filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
         )
-        primary_key_names = [column[1].name for column in primary_key_columns]
+        primary_key_names = [pk[0] for pk in primary_key_columns]
     else:
         from sqlalchemy.inspection import inspect
 
@@ -180,7 +179,6 @@ def get_model_pk_attr_name(model_class):
         raise RuntimeError(f"Couldn't find attribute for {model_class}")
     else:
         raise RuntimeError("Multiple primary keys still not supported")
-
 
 def get_model_pk_column(model_class):
     """
