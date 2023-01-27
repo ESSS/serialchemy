@@ -10,6 +10,8 @@ admission: '2000-01-01'
 company:
   id: 5
   location: Korhal
+  master_engeneer_id: 4
+  master_manager_id: 1
   name: Terrans
 company_id: 5
 contract_type: null

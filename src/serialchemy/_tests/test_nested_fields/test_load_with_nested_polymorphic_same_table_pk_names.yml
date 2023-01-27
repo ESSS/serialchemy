@@ -1,0 +1,19 @@
+id: 5
+location: null
+master_engeneer: null
+master_engeneer_id: null
+master_manager:
+  address_id: 1
+  admission: '2000-01-01'
+  company_id: 5
+  contract_type: null
+  created_at: '2000-01-02T00:00:00'
+  email: null
+  firstname: Jim
+  id: 1
+  lastname: Raynor
+  manager_name: null
+  password: null
+  role: Manager
+master_manager_id: null
+name: null

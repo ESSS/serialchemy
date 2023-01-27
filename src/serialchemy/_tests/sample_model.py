@@ -23,6 +23,10 @@ class Company(Base):
     name = Column(String)
     location = Column(String)
     employees = relationship("Employee", lazy='dynamic')
+    master_engeneer_id = Column(Integer, ForeignKey('SpecialistEngineer.esp_id'))
+    master_engeneer = relationship('SpecialistEngineer', foreign_keys=[master_engeneer_id])
+    master_manager_id = Column(Integer, ForeignKey('Manager.id'))
+    master_manager = relationship('Manager', foreign_keys=[master_manager_id])
 
 
 class Department(Base):
@@ -75,7 +79,7 @@ class Employee(Base):
 
     __tablename__ = 'Employee'
 
-    id = Column(Integer, primary_key=True)
+    id = Column('id', Integer, primary_key=True)
     firstname = Column(String)
     lastname = Column(String)
     email = Column(String)
@@ -117,7 +121,7 @@ class Engineer(Employee):
 
     __tablename__ = 'Engineer'
 
-    id = Column(Integer, ForeignKey('Employee.id'), primary_key=True)
+    id = Column('eng_id',Integer, ForeignKey('Employee.id'), primary_key=True)
     engineer_name = Column(String(30))
 
     __mapper_args__ = {'polymorphic_identity': 'Engineer', 'polymorphic_on': Employee.role}
@@ -127,7 +131,7 @@ class SpecialistEngineer(Engineer):
 
     __tablename__ = 'SpecialistEngineer'
 
-    id = Column(Integer, ForeignKey('Engineer.id'), primary_key=True)
+    id = Column('esp_id', Integer, ForeignKey('Engineer.eng_id'), primary_key=True)
     specialization = Column(String(30))
 
     __mapper_args__ = {
@@ -139,7 +143,7 @@ class Manager(Employee):
 
     __tablename__ = 'Manager'
 
-    id = Column(Integer, ForeignKey('Employee.id'), primary_key=True)
+    id = Column('id', Integer, ForeignKey('Employee.id'), primary_key=True)
     manager_name = Column(String(30))
 
     __mapper_args__ = {
