@@ -7,7 +7,7 @@ with open("README.rst", encoding="UTF-8") as readme_file:
 with open("CHANGELOG.rst", encoding="UTF-8") as changelog_file:
     history = changelog_file.read()
 
-requirements = ["sqlalchemy>=1.1"]
+requirements = ["sqlalchemy>=1.3,<2.0"]
 extras_require = {
     "docs": ["sphinx >= 1.4", "sphinx_rtd_theme", "sphinx-autodoc-typehints", "typing_extensions"],
     "testing": [

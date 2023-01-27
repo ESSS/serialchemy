@@ -1,10 +1,9 @@
+from sqlalchemy.orm.dynamic import AppenderMixin
 from warnings import warn
 
-from sqlalchemy.orm.dynamic import AppenderMixin
-
 from .field import Field
-from .serializer import Serializer
 from .model_serializer import ModelSerializer
+from .serializer import Serializer
 
 
 class SessionBasedField(Field):
@@ -153,24 +152,33 @@ class NestedAttributesSerializer(Serializer):
     def load(self, serialized, session=None):
         raise NotImplementedError()
 
-
 def get_model_pk_attr_name(model_class):
     """
     Get the primary key attribute name from a Declarative model class
 
     :param Type[DeclarativeMeta] model_class: a Declarative class
 
-    :return: str: a Column name
+    :return: str: the attribute name for the column with primary key
     """
-    from sqlalchemy.inspection import inspect
-    primary_key_names = [pk for pk in inspect(model_class)._primary_key_propkeys]
+    import sys
+
+    # TODO EDEN-2586: Investigate SqlAlchemy inspect failing on Python 3.6
+    if sys.version_info[:2] == (3, 6):
+        primary_key_columns = list(
+            filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
+        )
+        primary_key_names = [pk[0] for pk in primary_key_columns]
+    else:
+        from sqlalchemy.inspection import inspect
+
+        primary_key_names = [pk for pk in inspect(model_class)._primary_key_propkeys]
+
     if len(primary_key_names) == 1:
         return primary_key_names[0]
     elif len(primary_key_names) < 1:
         raise RuntimeError(f"Couldn't find attribute for {model_class}")
     else:
         raise RuntimeError("Multiple primary keys still not supported")
-
 
 def get_model_pk_column(model_class):
     """

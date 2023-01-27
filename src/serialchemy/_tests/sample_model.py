@@ -1,9 +1,10 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, select, Float, Date
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Float, Date
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import declarative_base, object_session, relationship
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import ChoiceType
 
 from serialchemy.model_serializer import ModelSerializer
