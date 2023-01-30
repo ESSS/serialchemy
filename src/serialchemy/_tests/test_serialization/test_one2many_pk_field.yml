@@ -3,4 +3,6 @@ employees:
 - 2
 id: 5
 location: Korhal
+master_engeneer_id: null
+master_manager_id: null
 name: Terrans

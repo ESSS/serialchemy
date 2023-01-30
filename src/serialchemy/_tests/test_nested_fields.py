@@ -1,4 +1,5 @@
 import pytest
+from freezegun import freeze_time
 
 from serialchemy import ModelSerializer
 from serialchemy._tests.sample_model import (
@@ -29,6 +30,12 @@ class EmployeeSerializerNestedAttrsFields(ModelSerializer):
     company = NestedAttributesField(("name", "location"))
 
 
+class CompanySerializer(ModelSerializer):
+
+    master_engeneer = NestedModelField(SpecialistEngineer)
+    master_manager = NestedModelField(Manager)
+
+
 @pytest.fixture(autouse=True)
 def setup(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
@@ -47,6 +54,11 @@ def setup(db_session):
 
     db_session.add_all([company, emp1, emp2, emp3, emp4])
     db_session.commit()
+
+    company.master_engeneer = emp4
+    company.master_manager = emp1
+    db_session.commit()
+
 
 
 @pytest.mark.parametrize(
@@ -102,3 +114,37 @@ def test_empty_nested(db_session):
     assert serialized["company"] is None
     model = serializer.load(serialized, session=db_session)
     assert model.company is None
+
+
+def test_dump_with_nested_polymorphic(db_session, data_regression):
+    serializer = CompanySerializer(Company)
+    serialized = serializer.dump(db_session.query(Company).first())
+    data_regression.check(serialized)
+
+
+@freeze_time("2021-06-15")
+def test_load_with_nested_polymorphic_with_different_table_pk_names(db_session, data_regression):
+    # SpecializedEngeneer and its base class Engeneer have different names for the primary key on the database table
+    serializer = CompanySerializer(Company)
+    serialized = {
+        'id': 5,
+        'master_engeneer': {
+            'id': 4
+        }
+    }
+    model = serializer.load(serialized, session=db_session)
+    data_regression.check(serializer.dump(model))
+
+
+def test_load_with_nested_polymorphic_same_table_pk_names(db_session, data_regression):
+    # Manager and its base class Empoyee have the same name for the primary key on the database table
+    serializer = CompanySerializer(Company)
+    serialized = {
+        'id': 5,
+        'master_manager': {
+            'id': 1
+        }
+    }
+    model = serializer.load(serialized, session=db_session)
+    data_regression.check(serializer.dump(model))
+

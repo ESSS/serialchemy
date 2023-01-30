@@ -160,21 +160,12 @@ def get_model_pk_attr_name(model_class):
 
     :return: str: the attribute name for the column with primary key
     """
-    import sys
-
-    # TODO EDEN-2586: Investigate SqlAlchemy inspect failing on Python 3.6
-    if sys.version_info[:2] == (3, 6):
-        primary_key_columns = list(
-            filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
-        )
-        primary_key_names = [pk[0] for pk in primary_key_columns]
-    else:
-        from sqlalchemy.inspection import inspect
-
-        primary_key_names = [pk for pk in inspect(model_class)._primary_key_propkeys]
-
+    primary_key_columns = list(
+        filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
+    )
+    primary_key_names = set(column[0] for column in primary_key_columns)
     if len(primary_key_names) == 1:
-        return primary_key_names[0]
+        return primary_key_names.pop()
     elif len(primary_key_names) < 1:
         raise RuntimeError(f"Couldn't find attribute for {model_class}")
     else:

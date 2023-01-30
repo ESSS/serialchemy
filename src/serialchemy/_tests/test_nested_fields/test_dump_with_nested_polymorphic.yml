@@ -1,0 +1,32 @@
+id: 5
+location: Korhal
+master_engeneer:
+  address_id: null
+  admission: '2000-01-01'
+  company_id: null
+  contract_type: null
+  created_at: '2000-01-02T00:00:00'
+  email: null
+  engineer_name: null
+  firstname: Doran
+  id: 4
+  lastname: Routhe
+  password: null
+  role: Specialist Engineer
+  specialization: Mechanical
+master_engeneer_id: 4
+master_manager:
+  address_id: 1
+  admission: '2000-01-01'
+  company_id: 5
+  contract_type: null
+  created_at: '2000-01-02T00:00:00'
+  email: null
+  firstname: Jim
+  id: 1
+  lastname: Raynor
+  manager_name: null
+  password: null
+  role: Manager
+master_manager_id: 1
+name: Terrans
