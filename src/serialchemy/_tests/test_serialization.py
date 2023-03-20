@@ -1,19 +1,12 @@
 import pytest
 
 from serialchemy._tests.sample_model import (
-    Address,
-    Company,
-    Department,
-    Employee,
-    Manager,
-    Engineer,
-    SpecialistEngineer,
-    ContractType,
-)
+    Address, Company, ContractType, Department, Employee, Engineer, Manager, MaritalStatus,
+    SpecialistEngineer)
 from serialchemy.field import Field
 from serialchemy.func import dump
-from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
 from serialchemy.model_serializer import ModelSerializer
+from serialchemy.nested_fields import NestedAttributesField, NestedModelField, PrimaryKeyField
 from serialchemy.polymorphic_serializer import PolymorphicModelSerializer
 
 
@@ -62,11 +55,11 @@ class EmployeeSerializerCreationOnlyField(ModelSerializer):
 def seed_data(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
     emp1 = Manager(
-        id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company
+        id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company, marital_status=MaritalStatus.MARRIED
     )
-    emp2 = Engineer(id=2, firstname='Sarah', lastname='Kerrigan', role='Engineer', company=company)
+    emp2 = Engineer(id=2, firstname='Sarah', lastname='Kerrigan', role='Engineer', company=company, marital_status=MaritalStatus.MARRIED)
     emp3 = Employee(
-        id=3, firstname='Tychus', lastname='Findlay', contract_type=ContractType.CONTRACTOR
+        id=3, firstname='Tychus', lastname='Findlay', contract_type=ContractType.CONTRACTOR, marital_status=MaritalStatus.SINGLE
     )
     emp4 = SpecialistEngineer(
         id=4, firstname='Doran', lastname='Routhe', specialization='Mechanical'
@@ -94,6 +87,7 @@ def test_model_load(data_regression):
         "lastname": "Kerrigan",
         "email": "sarahk@blitz.com",
         "admission": "2152-01-02T00:00:00",
+        "marital_status": "Married"
     }
     model = serializer.load(employee_dict)
     data_regression.Check(dump(model))

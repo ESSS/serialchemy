@@ -20,4 +20,5 @@ email: null
 firstname: Jim
 id: 1
 lastname: Raynor
+marital_status: Married
 role: Manager
