@@ -1,8 +1,8 @@
 import pytest
 
 from serialchemy._tests.sample_model import (
-    Address, Company, ContractType, Department, Employee, Engineer, Manager, MaritalStatus,
-    SpecialistEngineer)
+    Address, Company, ContractType, Department, Employee, EmployeeSerializer, Engineer, Manager,
+    MaritalStatus, SpecialistEngineer)
 from serialchemy.field import Field
 from serialchemy.func import dump
 from serialchemy.model_serializer import ModelSerializer
@@ -79,6 +79,12 @@ def test_model_dump(db_session, data_regression):
     serialized = serializer.dump(emp)
     data_regression.Check(serialized)
 
+def test_enum_key_field_dump(db_session, data_regression):
+    emp = db_session.query(Employee).get(1)
+    serializer = EmployeeSerializer(Employee)
+    serialized = serializer.dump(emp)
+    data_regression.Check(serialized)
+
 
 def test_model_load(data_regression):
     serializer = ModelSerializer(Employee)
@@ -88,6 +94,18 @@ def test_model_load(data_regression):
         "email": "sarahk@blitz.com",
         "admission": "2152-01-02T00:00:00",
         "marital_status": "Married"
+    }
+    model = serializer.load(employee_dict)
+    data_regression.Check(dump(model))
+
+def test_enum_key_field_load(data_regression):
+    serializer = EmployeeSerializer(Employee)
+    employee_dict = {
+        "firstname": "Sarah",
+        "lastname": "Kerrigan",
+        "email": "sarahk@blitz.com",
+        "admission": "2152-01-02T00:00:00",
+        "marital_status": "MARRIED"
     }
     model = serializer.load(employee_dict)
     data_regression.Check(dump(model))

@@ -8,7 +8,7 @@ from sqlalchemy.orm import object_session, relationship
 from sqlalchemy.sql import sqltypes
 from sqlalchemy_utils import ChoiceType
 
-from serialchemy.enum_serializer import EnumKeySerializer
+from serialchemy.enum_field import EnumKeyField
 from serialchemy.field import Field
 from serialchemy.model_serializer import ModelSerializer
 from serialchemy.nested_fields import NestedModelField, NestedModelListField
@@ -165,4 +165,4 @@ class EmployeeSerializer(ModelSerializer):
     company_name = Field(dump_only=True)
     address = NestedModelField(Address)
     contacts = NestedModelListField(Contact)
-    marital_status = Field(serializer=EnumKeySerializer(MaritalStatus))
+    marital_status = EnumKeyField(MaritalStatus)
