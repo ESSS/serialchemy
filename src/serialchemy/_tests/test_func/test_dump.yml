@@ -12,5 +12,6 @@ email: null
 firstname: Sarah
 id: 2
 lastname: Kerrigan
+marital_status: Divorced
 password: null
 role: Employee

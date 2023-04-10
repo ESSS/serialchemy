@@ -13,6 +13,7 @@ master_manager:
   id: 1
   lastname: Raynor
   manager_name: null
+  marital_status: Married
   password: null
   role: Manager
 master_manager_id: null

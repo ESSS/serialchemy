@@ -1,13 +1,13 @@
 import pytest
 
 from serialchemy import func
-from serialchemy._tests.sample_model import Company, Employee
+from serialchemy._tests.sample_model import Company, Employee, MaritalStatus
 
 
 @pytest.fixture(autouse=True)
 def seed_data(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
-    employee = Employee(id=2, firstname='Sarah', lastname='Kerrigan', company=company)
+    employee = Employee(id=2, firstname='Sarah', lastname='Kerrigan', company=company, marital_status=MaritalStatus.DIVORCED)
     db_session.add(employee)
     db_session.commit()
 

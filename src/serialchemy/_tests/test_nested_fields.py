@@ -3,13 +3,7 @@ from freezegun import freeze_time
 
 from serialchemy import ModelSerializer
 from serialchemy._tests.sample_model import (
-    Address,
-    Company,
-    Employee,
-    Manager,
-    Engineer,
-    SpecialistEngineer,
-)
+    Address, Company, Employee, Engineer, Manager, MaritalStatus, SpecialistEngineer)
 from serialchemy.field import Field
 from serialchemy.nested_fields import NestedAttributesField, NestedModelField
 
@@ -40,12 +34,12 @@ class CompanySerializer(ModelSerializer):
 def setup(db_session):
     company = Company(id=5, name='Terrans', location='Korhal')
     emp1 = Manager(
-        id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company
+        id=1, firstname='Jim', lastname='Raynor', role='Manager', _salary=400, company=company, marital_status=MaritalStatus.MARRIED
     )
     emp2 = Engineer(id=2, firstname='Sarah', lastname='Kerrigan', role='Engineer', company=company)
     emp3 = Employee(id=3, firstname='Tychus', lastname='Findlay')
     emp4 = SpecialistEngineer(
-        id=4, firstname='Doran', lastname='Routhe', specialization='Mechanical'
+        id=4, firstname='Doran', lastname='Routhe', specialization='Mechanical', marital_status=MaritalStatus.MARRIED
     )
 
     addr1 = Address(street="5 Av", number="943", city="Tarsonis")
@@ -80,6 +74,7 @@ def test_deserialize_with_custom_serializer(db_session, data_regression):
     serialized = {
         "firstname": "John",
         "lastname": "Doe",
+        "marital_status": "Married",
         "company_id": 5,
         "admission": "2004-06-01T00:00:00",
         "address": {"id": 1, "number": "245", "street": "6 Av", "zip": "88088-000"},

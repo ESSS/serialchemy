@@ -7,5 +7,6 @@ email: null
 firstname: Tychus
 id: 3
 lastname: Findlay
+marital_status: Single
 password: null
 role: Employee

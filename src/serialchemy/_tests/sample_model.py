@@ -1,16 +1,17 @@
 from datetime import datetime
 from enum import Enum
-
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Float, Date
+from sqlalchemy import Column, Date, DateTime, Float, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.sql import sqltypes
 from sqlalchemy_utils import ChoiceType
 
-from serialchemy.model_serializer import ModelSerializer
+from serialchemy.enum_field import EnumKeyField
 from serialchemy.field import Field
+from serialchemy.model_serializer import ModelSerializer
 from serialchemy.nested_fields import NestedModelField, NestedModelListField
-from sqlalchemy.ext.hybrid import hybrid_property
 
 Base = declarative_base()
 
@@ -74,6 +75,10 @@ class ContractType(Enum):
     CONTRACTOR = 'Contractor'
     OTHER = 'Other'
 
+class MaritalStatus(Enum):
+    SINGLE = 'Single'
+    MARRIED = 'Married'
+    DIVORCED = 'Divorced'
 
 class Employee(Base):
 
@@ -94,6 +99,8 @@ class Employee(Base):
     role = Column(String)
     _salary = Column(Float)
     contract_type = Column(ChoiceType(ContractType))
+    marital_status = Column(sqltypes.Enum(MaritalStatus))
+
 
     password = Column(String)
     created_at = Column(DateTime, default=datetime(2000, 1, 2))
@@ -158,3 +165,4 @@ class EmployeeSerializer(ModelSerializer):
     company_name = Field(dump_only=True)
     address = NestedModelField(Address)
     contacts = NestedModelListField(Contact)
+    marital_status = EnumKeyField(MaritalStatus)

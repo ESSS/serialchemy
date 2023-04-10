@@ -11,6 +11,7 @@ master_engeneer:
   firstname: Doran
   id: 4
   lastname: Routhe
+  marital_status: Married
   password: null
   role: Specialist Engineer
   specialization: Mechanical

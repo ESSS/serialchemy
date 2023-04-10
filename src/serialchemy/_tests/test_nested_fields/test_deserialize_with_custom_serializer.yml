@@ -15,4 +15,5 @@ email: null
 firstname: John
 id: null
 lastname: Doe
+marital_status: Married
 role: Employee
