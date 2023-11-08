@@ -1,5 +1,7 @@
-from sqlalchemy.orm.dynamic import AppenderMixin
 from warnings import warn
+
+from sqlalchemy.orm import class_mapper
+from sqlalchemy.orm.dynamic import AppenderMixin
 
 from .field import Field
 from .model_serializer import ModelSerializer
@@ -152,6 +154,7 @@ class NestedAttributesSerializer(Serializer):
     def load(self, serialized, session=None):
         raise NotImplementedError()
 
+
 def get_model_pk_attr_name(model_class):
     """
     Get the primary key attribute name from a Declarative model class
@@ -161,7 +164,7 @@ def get_model_pk_attr_name(model_class):
     :return: str: the attribute name for the column with primary key
     """
     primary_key_columns = list(
-        filter(lambda attr_col: attr_col[1].primary_key, model_class.__mapper__.columns.items())
+        filter(lambda attr_col: attr_col[1].primary_key, class_mapper(model_class).columns.items())
     )
     primary_key_names = set(column[0] for column in primary_key_columns)
     if len(primary_key_names) == 1:
@@ -171,6 +174,7 @@ def get_model_pk_attr_name(model_class):
     else:
         raise RuntimeError("Multiple primary keys still not supported")
 
+
 def get_model_pk_column(model_class):
     """
     Get the primary key Column object from a Declarative model class
@@ -179,6 +183,6 @@ def get_model_pk_column(model_class):
 
     :rtype: Column
     """
-    primary_keys = model_class.__mapper__.primary_key
+    primary_keys = class_mapper(model_class).primary_key
     assert len(primary_keys) == 1, "Nested object must have exactly one primary key"
     return primary_keys[0]

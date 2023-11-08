@@ -66,6 +66,7 @@ environment.yml
 
 # VSCode local history
 .history
+.vscode
 
 # mypy
 .mypy_cache/

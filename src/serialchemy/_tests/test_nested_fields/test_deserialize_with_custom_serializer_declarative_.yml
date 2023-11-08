@@ -1,0 +1,19 @@
+address:
+  city: Tarsonis
+  id: 1
+  number: '245'
+  state: Mich
+  street: 6 Av
+  zip: 88088-000
+address_id: null
+admission: '2004-06-01'
+company: null
+company_id: 5
+contract_type: null
+created_at: null
+email: some@email.com
+firstname: John
+id: null
+lastname: Doe
+marital_status: Married
+role: Employee

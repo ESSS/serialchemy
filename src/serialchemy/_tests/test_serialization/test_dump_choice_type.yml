@@ -1,12 +1,12 @@
-address_id: null
+address_id: 1
 admission: '2000-01-01'
-company_id: null
-contract_type: Contractor
+company_id: 5
+contract_type: Employee
 created_at: '2000-01-02T00:00:00'
-email: null
+email: some
 firstname: Tychus
 id: 3
 lastname: Findlay
 marital_status: Single
-password: null
+password: mypass
 role: Employee

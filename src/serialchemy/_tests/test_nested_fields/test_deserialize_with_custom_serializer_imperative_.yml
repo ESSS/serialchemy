@@ -2,7 +2,7 @@ address:
   city: Tarsonis
   id: 1
   number: '245'
-  state: null
+  state: Mich
   street: 6 Av
   zip: 88088-000
 address_id: null
@@ -10,8 +10,8 @@ admission: '2004-06-01'
 company: null
 company_id: 5
 contract_type: null
-created_at: null
-email: null
+created_at: '2000-01-02T00:00:00'
+email: some@email.com
 firstname: John
 id: null
 lastname: Doe
