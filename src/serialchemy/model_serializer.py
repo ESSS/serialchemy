@@ -146,7 +146,7 @@ class ModelSerializer(Serializer):
         """
         return self._model_class.__name__
 
-    def _create_model(self, serialized: dict[str, Any]):
+    def _create_model(self, serialized: Dict[str, Any]):
         """
         Can be overridden in a derived class to customize model initialization.
 

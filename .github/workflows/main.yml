@@ -18,11 +18,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        python: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         os: [ubuntu-20.04, windows-latest]
-        exclude:
-          - python: "3.6"
-            os: "windows-latest"
 
     steps:
       - uses: actions/checkout@v1
@@ -36,6 +33,11 @@ jobs:
           python -m pip install tox tox-gh-actions
       - name: Test with tox
         run: tox
+      - name: Upload codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
 
   deploy:
 
