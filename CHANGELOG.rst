@@ -1,7 +1,7 @@
 History
 =======
 
-0.4.0 (2013-12-11)
+0.4.0 (2023-12-11)
 ------------------
 * Fix to get model attribute name instead of table column name on polymorphic serializer
 * Extends the PolymorphicModelSerializer to accept also column descriptors when searching

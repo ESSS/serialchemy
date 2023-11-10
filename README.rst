@@ -191,18 +191,3 @@ Ex.: v1.0.5
 3. Push a branch with the changes.
 4. Once all builds pass, push a ``VERSION`` tag to ``upstream``.
 5. Merge the PR.
-
-
-History
-=======
-
-0.4.0 (2013-12-11)
-------------------
-* Fix to get model attribute name instead of table column name on polymorphic serializer
-* Extends the PolymorphicModelSerializer to accept also column descriptors when searching
-  for the polymorphic column key.
-* Add support for serialization of Python Enums
-* Change PolymorphicModelSerializer to support inherited models of inherited models
-* Change Field to use a default serializer for not None values
-* Added support for sqlalchemy 1.4
-* Add EnumKeySerializer
