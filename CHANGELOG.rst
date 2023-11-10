@@ -2,6 +2,17 @@
 History
 =======
 
+0.4.0 (2013-12-11)
+------------------
+* Fix to get model attribute name instead of table column name on polymorphic serializer
+* Extends the PolymorphicModelSerializer to accept also column descriptors when searching
+  for the polymorphic column key.
+* Add support for serialization of Python Enums
+* Change PolymorphicModelSerializer to support inherited models of inherited models
+* Change Field to use a default serializer for not None values
+* Added support for sqlalchemy 1.4
+* Add EnumKeySerializer
+
 0.3.0 (2019-17-07)
 ------------------
 * Add the composite fields to list of properties of model, to serialize that fields if it type is in EXTRA_SERIALIZERS.
