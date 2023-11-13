@@ -1,6 +1,14 @@
 name: build
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - rb-*
+    tags:
+      - v*
+
+  pull_request:
 
 jobs:
   build:
@@ -38,9 +46,9 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: "3.10"
       - name: Install wheel
@@ -51,8 +59,7 @@ jobs:
         run: |
           python setup.py sdist bdist_wheel
       - name: Publish package to PyPI
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.pypi_token }}

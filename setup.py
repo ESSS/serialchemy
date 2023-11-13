@@ -26,6 +26,8 @@ extras_require = {
 setup(
     author="ESSS",
     author_email="foss@esss.co",
+    use_scm_version={"git_describe_command": "git describe --dirty --tags --long --match v*"},
+    setup_requires=["setuptools_scm"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -44,6 +46,7 @@ setup(
     include_package_data=True,
     python_requires=">=3.6",
     keywords="serialchemy",
+    data_files=[("", ["LICENSE"])],
     name="serialchemy",
     packages=find_packages(where="src"),
     package_dir={"": "src"},

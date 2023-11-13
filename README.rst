@@ -23,7 +23,7 @@ Serialchemy
 
 
 SQLAlchemy model serialization.
-===============
+===============================
 
 Motivation
 ----------
@@ -52,12 +52,12 @@ Suppose we have an `Employee` SQLAlchemy_ model declared:
 .. code-block:: python
 
     class Employee(Base):
-        __tablename__ = 'Employee'
+        __tablename__ = "Employee"
 
         id = Column(Integer, primary_key=True)
         fullname = Column(String)
         admission = Column(DateTime, default=datetime(2000, 1, 1))
-        company_id = Column(ForeignKey('Company.id'))
+        company_id = Column(ForeignKey("Company.id"))
         company = relationship(Company)
         company_name = column_property(
             select([Company.name]).where(Company.id == company_id)
@@ -70,26 +70,29 @@ Suppose we have an `Employee` SQLAlchemy_ model declared:
 
     from serialchemy import ModelSerializer
 
-    emp = Employee(fullname='Roberto Silva', admission=datetime(2019, 4, 2))
+    emp = Employee(fullname="Roberto Silva", admission=datetime(2019, 4, 2))
 
     serializer = ModelSerializer(Employee)
     serializer.dump(emp)
 
-    >> {'id': None,
-        'fullname': 'Roberto Silva',
-        'admission': '2019-04-02T00:00:00',
-        'company_id': None,
-        'company_name': None,
-        'password': None
-        }
+    # >>
+    {
+        "id": None,
+        "fullname": "Roberto Silva",
+        "admission": "2019-04-02T00:00:00",
+        "company_id": None,
+        "company_name": None,
+        "password": None,
+    }
 
 New items can be deserialized by the same serializer:
 
 .. code-block:: python
 
-    new_employee = {'fullname': 'Jobson Gomes', 'admission': '2018-02-03'}
+    new_employee = {"fullname": "Jobson Gomes", "admission": "2018-02-03"}
     serializer.load(new_employee)
-    >> <Employee object at 0x000001C119DE3940>
+
+    # >> <Employee object at 0x000001C119DE3940>
 
 Serializers do not commit into the database. You must do this by yourself:
 
@@ -110,19 +113,19 @@ For anything beyond `Generic Types`_ we must extend the `ModelSerializer` class:
 
     class EmployeeSerializer(ModelSerializer):
 
-        password = Field(load_only=True)     # passwords should be only deserialized
+        password = Field(load_only=True)  # passwords should be only deserialized
         company = NestedModelField(Company)  # dump company as nested object
+
 
     serializer = EmployeeSerializer(Employee)
     serializer.dump(emp)
-
-    >> {'id': 1,
-        'fullname': 'Roberto Silva',
-        'admission': '2019-04-02T00:00:00',
-        'company': {'id': 3,
-                    'name': 'Acme Co'
-                   }
-        }
+    # >>
+    {
+        "id": 1,
+        "fullname": "Roberto Silva",
+        "admission": "2019-04-02T00:00:00",
+        "company": {"id": 3, "name": "Acme Co"},
+    }
 
 
 Extend Polymorphic Serializer
@@ -138,18 +141,16 @@ assume it have a joined table inheritance:
         ...
         type = Column(String(50))
 
-        __mapper_args__ = {
-            'polymorphic_identity':'employee',
-            'polymorphic_on':type
-        }
+        __mapper_args__ = {"polymorphic_identity": "employee", "polymorphic_on": type}
+
 
     class Engineer(Employee):
-        __tablename__ = 'Engineer'
-        id = Column(Integer, ForeignKey('employee.id'), primary_key=True)
+        __tablename__ = "Engineer"
+        id = Column(Integer, ForeignKey("employee.id"), primary_key=True)
         association = relationship(Association)
 
         __mapper_args__ = {
-            'polymorphic_identity':'engineer',
+            "polymorphic_identity": "engineer",
         }
 
 To use a extended `ModelSerializer` class on the `Engineer` class, you should create
@@ -157,13 +158,16 @@ the serializer as it follows:
 
 .. code-block:: python
 
-    class EmployeeSerializer(PolymorphicModelSerializer): # Since this class will be polymorphic
+    class EmployeeSerializer(
+        PolymorphicModelSerializer
+    ):  # Since this class will be polymorphic
 
         password = Field(load_only=True)
         company = NestedModelField(Company)
 
+
     class EngineerSerializer(EmployeeSerializer):
-         __model_class__ = Engineer # This is the table Serialchemy will refer to
+        __model_class__ = Engineer  # This is the table Serialchemy will refer to
         association = NestedModelField(Association)
 
 Contributing
