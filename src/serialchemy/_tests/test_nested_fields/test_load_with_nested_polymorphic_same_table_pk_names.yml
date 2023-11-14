@@ -1,5 +1,5 @@
 id: 5
-location: null
+location: Delawere
 master_engeneer: null
 master_engeneer_id: null
 master_manager:
@@ -8,13 +8,13 @@ master_manager:
   company_id: 5
   contract_type: null
   created_at: '2000-01-02T00:00:00'
-  email: null
+  email: some@email.com
   firstname: Jim
   id: 1
   lastname: Raynor
   manager_name: null
   marital_status: Married
-  password: null
+  password: somepass
   role: Manager
 master_manager_id: null
-name: null
+name: Company 1

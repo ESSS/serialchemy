@@ -6,13 +6,13 @@ master_engeneer:
   company_id: null
   contract_type: null
   created_at: '2000-01-02T00:00:00'
-  email: null
+  email: some@email.com
   engineer_name: null
   firstname: Doran
   id: 4
   lastname: Routhe
   marital_status: Married
-  password: null
+  password: somepass
   role: Specialist Engineer
   specialization: Mechanical
 master_engeneer_id: 4
@@ -22,13 +22,13 @@ master_manager:
   company_id: 5
   contract_type: null
   created_at: '2000-01-02T00:00:00'
-  email: null
+  email: some@email.com
   firstname: Jim
   id: 1
   lastname: Raynor
   manager_name: null
   marital_status: Married
-  password: null
+  password: somepass
   role: Manager
 master_manager_id: 1
 name: Terrans

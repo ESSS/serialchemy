@@ -1,19 +1,29 @@
+import inspect
 import warnings
+from functools import cached_property
+from typing import Any
+from typing import Dict
 
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import class_mapper
+from sqlalchemy.orm import Mapper
 
-from serialchemy.enum_serializer import EnumSerializer
-from serialchemy.serializer_checks import is_datetime_column, is_enum_column, is_date_column
-
-from .datetime_serializer import DateTimeColumnSerializer, DateColumnSerializer
-from .field import Field, DefaultFieldSerializer
+from .datetime_serializer import DateColumnSerializer
+from .datetime_serializer import DateTimeColumnSerializer
+from .field import DefaultFieldSerializer
+from .field import Field
 from .serializer import Serializer
+from serialchemy.enum_serializer import EnumSerializer
+from serialchemy.serializer_checks import is_date_column
+from serialchemy.serializer_checks import is_datetime_column
+from serialchemy.serializer_checks import is_enum_column
 
 
 class ModelSerializer(Serializer):
     """
     Serializer for SQLAlchemy Declarative classes
     """
+
+    _class_mapper: Mapper
 
     EXTRA_SERIALIZERS = [
         (DateTimeColumnSerializer, is_datetime_column),
@@ -26,6 +36,7 @@ class ModelSerializer(Serializer):
         :param Type[DeclarativeMeta] model_class: the SQLAlchemy mapping class to be serialized
         """
         self._model_class = model_class
+        self._class_mapper = class_mapper(model_class)
         self._fields = self._get_declared_fields()
         self._initialize_fields(nest_foreign_keys)
 
@@ -33,13 +44,21 @@ class ModelSerializer(Serializer):
     def model_class(self):
         return self._model_class
 
+    @cached_property
+    def model_class_parameters(self):
+        return inspect.signature(self.model_class.__init__).parameters
+
+    @property
+    def mapper(self) -> Mapper:
+        return self._class_mapper
+
     @property
     def model_columns(self):
-        return self._model_class.__mapper__.c
+        return self.mapper.c
 
     @property
     def model_composites(self):
-        return self._model_class.__mapper__.composites
+        return self.mapper.composites
 
     @property
     def model_properties(self):
@@ -91,11 +110,7 @@ class ModelSerializer(Serializer):
         """
         from .nested_fields import SessionBasedField
 
-        if existing_model:
-            model = existing_model
-        else:
-            model = self._create_model(serialized)
-            assert model is not None, "ModelSerializer._create_model cannot return None"
+        prepared_attrs = {}
         for field_name, value in serialized.items():
             if field_name not in self._fields:
                 warnings.warn(f"Field '{field_name}' not defined for {self._model_class.__name__}")
@@ -110,7 +125,19 @@ class ModelSerializer(Serializer):
                 deserialized = field.load(value, session=session)
             else:
                 deserialized = field.load(value)
-            setattr(model, field_name, deserialized)
+            prepared_attrs[field_name] = deserialized
+
+        if existing_model:
+            model = existing_model
+            for key, value in prepared_attrs.items():
+                setattr(model, key, value)
+        else:
+            model = self._create_model(prepared_attrs)
+            assert model is not None, "ModelSerializer._create_model cannot return None"
+            for key, value in prepared_attrs.items():
+                if key in self.model_class_parameters:
+                    continue
+                setattr(model, key, value)
         return model
 
     def get_model_name(self):
@@ -119,7 +146,7 @@ class ModelSerializer(Serializer):
         """
         return self._model_class.__name__
 
-    def _create_model(self, serialized):
+    def _create_model(self, serialized: Dict[str, Any]):
         """
         Can be overridden in a derived class to customize model initialization.
 
@@ -127,7 +154,15 @@ class ModelSerializer(Serializer):
 
         :rtype: DeclarativeMeta
         """
-        return self.model_class()
+        kwargs = {
+            key: value for key, value in serialized.items() if key in self.model_class_parameters
+        }
+        try:
+            return self.model_class(**kwargs)
+        except TypeError as e:
+            raise Exception(
+                f'Error while trying to create instance of class {self.model_class.__name__}: {e}'
+            )
 
     def _initialize_fields(self, nest_foreign_keys):
         """
@@ -159,7 +194,7 @@ class ModelSerializer(Serializer):
 
     @classmethod
     def _get_declared_fields(cls) -> dict:
-        fields = {}
+        fields: Dict[str, Any] = {}
         # Fields should be only defined ModelSerializer subclasses,
         if cls is ModelSerializer:
             return fields
@@ -184,7 +219,7 @@ class ModelSerializer(Serializer):
         except AttributeError:
             raise TypeError(f"{column_object} is not a foreign key Column")
         fk_column = fk_list[0].column
-        for name, rp in self._model_class.__mapper__.relationships.items():
+        for name, rp in self.mapper.relationships.items():
             if fk_column in rp.remote_side:
                 nested_model_class = rp.argument
                 return name, NestedModelField(nested_model_class)

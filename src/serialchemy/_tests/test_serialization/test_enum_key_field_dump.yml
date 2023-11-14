@@ -2,7 +2,7 @@ address:
   city: Tarsonis
   id: 1
   number: '943'
-  state: null
+  state: NA
   street: 5 Av
   zip: null
 address_id: 1
@@ -10,9 +10,9 @@ admission: '2000-01-01'
 company_id: 5
 company_name: Terrans
 contacts: []
-contract_type: null
+contract_type: Contractor
 created_at: '2000-01-02T00:00:00'
-email: null
+email: some
 firstname: Jim
 id: 1
 lastname: Raynor

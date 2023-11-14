@@ -1,0 +1,21 @@
+id: 5
+location: Delawere
+master_engeneer:
+  address_id: null
+  admission: '2000-01-01'
+  company_id: null
+  contract_type: null
+  created_at: '2000-01-02T00:00:00'
+  email: some@email.com
+  engineer_name: null
+  firstname: Doran
+  id: 4
+  lastname: Routhe
+  marital_status: Married
+  password: somepass
+  role: Specialist Engineer
+  specialization: Mechanical
+master_engeneer_id: null
+master_manager: null
+master_manager_id: null
+name: Company 1

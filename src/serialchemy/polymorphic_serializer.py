@@ -1,18 +1,18 @@
 from sqlalchemy import Column
+from sqlalchemy.orm import class_mapper
 
 from serialchemy import ModelSerializer
 
 
 def _get_identity(cls):
-    args = getattr(cls, '__mapper_args__', None)
-    return args.get('polymorphic_identity') if args is not None else None
+    return class_mapper(cls).polymorphic_identity
 
 
 def _get_identity_key(cls):
-    identityColumn = cls.__mapper_args__['polymorphic_on']
+    identityColumn = class_mapper(cls).polymorphic_on
     assert hasattr(identityColumn, 'key')
     column_db_name = identityColumn.key
-    for attribute_name, attribute in cls.__mapper__.c.items():
+    for attribute_name, attribute in class_mapper(cls).c.items():
         if attribute.key == column_db_name:
             return attribute_name
     raise AttributeError(
@@ -20,8 +20,9 @@ def _get_identity_key(cls):
     )
 
 
-def is_sqlalchemy_polymorphic(cls):
-    return hasattr(cls, '__mapper_args__') and cls.__mapper_args__.get('polymorphic_on') is not None
+def has_sqlalchemy_polymorphic_decendants(cls):
+    # if the class mapper has descendants, then it is a polymorphic structure and is not a leaf
+    return len(class_mapper(cls).self_and_descendants) > 1
 
 
 class PolymorphicModelSerializer(ModelSerializer):
@@ -32,8 +33,8 @@ class PolymorphicModelSerializer(ModelSerializer):
 
     def __init__(self, declarative_class):
         super().__init__(declarative_class)
-
-        if is_sqlalchemy_polymorphic(declarative_class):
+        # maped = class_mapper(declarative_class)
+        if has_sqlalchemy_polymorphic_decendants(declarative_class):
             self.is_polymorphic = True
             self.sub_serializers = self._get_sub_serializers(declarative_class)
             self.identity_key = _get_identity_key(declarative_class)
@@ -78,7 +79,7 @@ class PolymorphicModelSerializer(ModelSerializer):
 
     def dump(self, model):
         if self.is_polymorphic:
-            model_identity = _get_identity(model)
+            model_identity = _get_identity(model.__class__)
             if model_identity in self.sub_serializers:
                 return self.sub_serializers[model_identity].dump(model)
         return super().dump(model)
