@@ -57,10 +57,12 @@ class ContractType(Enum):
     CONTRACTOR = 'Contractor'
     OTHER = 'Other'
 
+
 class MaritalStatus(Enum):
     SINGLE = 'Single'
     MARRIED = 'Married'
     DIVORCED = 'Divorced'
+
 
 @dataclass
 class Employee:
@@ -85,10 +87,6 @@ class Employee:
     @property
     def company_name(self):
         return self.company.name
-
-    # @property
-    # def colleagues(self):
-    #     return object_session(self).query(Employee).filter(Employee.company_id == self.company_id)
 
     @property
     def full_name(self):
