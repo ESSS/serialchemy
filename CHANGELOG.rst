@@ -1,6 +1,12 @@
 History
 =======
 
+1.0.0 (2023-14-11)
+------------------
+* Add support for SQLAlchemy imperative (classical) mapping
+* Drop support for Python versions bellow 3.8
+* Drop support for SQLAlchemy 1.3
+
 0.4.0 (2023-12-11)
 ------------------
 * Fix to get model attribute name instead of table column name on polymorphic serializer
