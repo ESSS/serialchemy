@@ -1,6 +1,10 @@
 History
 =======
 
+1.0.1 (2023-17-11)
+------------------
+* Fix license placement on setup.py
+
 1.0.0 (2023-14-11)
 ------------------
 * Add support for SQLAlchemy imperative (classical) mapping
