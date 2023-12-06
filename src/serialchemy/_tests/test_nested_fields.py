@@ -96,7 +96,7 @@ def setup(model, db_session):
 def test_custom_serializer(model, serializer_strategy, db_session, data_regression):
     serializer_class = (
         getEmployeeSerializerNestedModelFields(model)
-        if serializer_strategy is "NestedModelFields"
+        if serializer_strategy == "NestedModelFields"
         else EmployeeSerializerNestedAttrsFields
     )
     emp = db_session.query(model.Employee).get(1)
