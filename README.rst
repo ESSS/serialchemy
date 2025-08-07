@@ -183,11 +183,10 @@ Release
 -------
 A reminder for the maintainers on how to make a new release.
 
-Note that the VERSION should folow the semantic versioning as X.Y.Z
-Ex.: v1.0.5
+Note that the VERSION should folow the semantic versioning as X.Y.Z Ex.: v1.0.5
 
-1. Create a ``release-VERSION`` branch from ``upstream/master``.
-2. Update ``CHANGELOG.rst``.
-3. Push a branch with the changes.
-4. Once all builds pass, push a ``VERSION`` tag to ``upstream``.
-5. Merge the PR.
+Create a release-VERSION branch from upstream/master.
+Update CHANGELOG.rst.
+Push a branch with the changes.
+Once all builds pass, push a VERSION tag to upstream. Ex: git tag v1.0.5; git push origin --tags
+Merge the PR.

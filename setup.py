@@ -18,8 +18,9 @@ extras_require = {
         "pytest-regressions",
         "pytest-freezegun",
         "pre-commit",
-        "tox",
+        "setuptools",
         "sqlalchemy_utils",
+        "tox",
     ],
 }
 

@@ -10,14 +10,12 @@ dependencies:
   - pytest-datadir
   - pytest-mock>=1.10
   - pytest-regressions>=1.0.0
-  - pytest-freezegun ==0.4.2
-  {% if PY==36 %}
-  - python ==3.6.11
-  {% elif PY==310 %}
+  - pytest-freezegun>=0.4.2
+  {% if PY==310 %}
   - python ==3.10.4  # [win]
   - python ==3.10.2  # [linux]
   {% endif %}
-  - sqlalchemy ==1.3.15  # [PY==36]
+  - setuptools  # [PY==312]
   - sqlalchemy ==1.4.44  # [PY==310]
   - sqlalchemy-utc>=0.10
   - sqlalchemy-utils>=0.33
