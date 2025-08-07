@@ -1,11 +1,14 @@
-from sqlalchemy import Column
+import enum
 from sqlalchemy.orm import class_mapper
 
 from serialchemy import ModelSerializer
 
 
 def _get_identity(cls):
-    return class_mapper(cls).polymorphic_identity
+    identity_value = class_mapper(cls).polymorphic_identity
+    if isinstance(identity_value, enum.Enum):
+        return identity_value.value
+    return identity_value
 
 
 def _get_identity_key(cls):

@@ -1,5 +1,8 @@
 History
 =======
+1.0.2 (2025-07-08)
+------------------
+* Adjust PolymorphicModelSerializer to accept a pure Enum as polymorphic identity
 
 1.0.1 (2023-17-11)
 ------------------
